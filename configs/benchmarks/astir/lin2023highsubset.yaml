@@ -1,0 +1,54 @@
+datasets:
+  lin2023highsubset:
+    benchmarks:
+      cell_level: 
+        cell_type:
+          label_col: cell_type
+          excluded_classes: [Other,]
+          cell_types:
+            Stroma:
+              - CD31
+              - SMA
+            Endothelial:
+              - CD31
+            Vascular smooth muscle:
+              - SMA
+            M2-like:
+              - CD45
+              - CD163
+            Tumor:
+              - Pan-CK
+              - E-cadherin
+            Th:
+              - CD45
+              - CD4
+            CTL:
+              - CD45
+              - CD3e
+              - CD8a
+            Macrophage:
+              - CD45
+            PD-L1+ tumor:
+              - Pan-CK
+              - E-cadherin
+              - PD-L1
+            T Cell:
+              - CD45
+              - CD3e
+            Treg:
+              - CD45
+              - CD4
+              - FOXP3
+            B cell:
+              - CD45
+              - CD20
+            Memory T:
+              - CD45
+              - CD3e
+              - CD8a
+              - CD45RO
+            Exhausted CD8 T cell:
+              - CD45
+              - CD3e
+              - CD8a
+              - PD-1

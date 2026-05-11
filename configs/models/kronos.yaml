@@ -1,0 +1,9 @@
+
+model: 
+  _target_: models.kronos.kronos_model.SporaKronosWrapper
+  model_name: kronos
+  checkpoint_path: /path/to/model_weights/kronos/kronos_vits16_model.pt
+  marker_metadata_path: /path/to/model_weights/kronos/marker_metadata.csv
+  uniprot_mapping: models/kronos/uniprot_id_translation.csv
+  tile_size: 224
+  image_mpp: 1.0

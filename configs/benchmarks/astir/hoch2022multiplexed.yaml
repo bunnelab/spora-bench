@@ -1,0 +1,25 @@
+datasets:
+  hoch2022multiplexed:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: [Other,]
+          cell_types:
+            Macrophage:
+              - CD68
+            Lymphocyte:
+              - CD38
+              - CD68
+              - CD15
+              - HLA-DR
+            Stroma:
+              - FAP
+              - CDH11
+              - SMA
+            Tumor:
+              - SOX10
+              - MLANA
+              - S100
+            T-Cell:
+              - CD3e

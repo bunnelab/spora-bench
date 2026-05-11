@@ -1,0 +1,32 @@
+datasets:
+  rigamonti2024integrating:
+    benchmarks:
+      cell_level: 
+        cell_type:
+          label_col: cell_type
+          excluded_classes: [other,]
+          cell_types:
+            Mf:
+              - CD68
+            aSMA+:
+              - aSMA
+            CD8+:
+              - CD3
+              - CD8
+            Bcells:
+              - CD20
+            Vim:
+              - Vimentin
+            Tumor cells:
+              - PanCytokeratin
+            CD4+:
+              - CD3
+              - CD4
+            vessels:
+              - CD31
+            Treg:
+              - CD3
+              - CD4
+              - FOXP3
+            Ki67+:
+              - Ki67

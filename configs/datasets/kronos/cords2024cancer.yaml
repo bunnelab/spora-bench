@@ -1,0 +1,9 @@
+datasets:
+  cords2024cancer:
+    name: cords2024cancer
+    path: /path/to/datasets/cords2024cancer
+    modality: imc
+    standardization: quantile_clipping/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: True

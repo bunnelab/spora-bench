@@ -1,0 +1,32 @@
+datasets:
+  meyer2025stratification:
+    benchmarks:
+      cell_level: 
+        metacluster_tumor_combined:
+          label_col: metacluster_tumor_combined
+          excluded_classes: []
+          cell_types:
+            HLA_DR:
+              - HLA-DR
+            Monocyte:
+              - CD68
+            Endothelial:
+              - CD31
+            CD8_T_cell:
+              - CD3
+              - CD8a
+            tumor:
+              - pan Cytokeratin
+            Stromal:
+              - SMA
+              - Vimentin
+              - Fibronectin
+            CD4_T_cell:
+              - CD3
+              - CD4
+            Immune_low:
+              - CD45
+            Neutrophil:
+              - CD15
+            B_cell:
+              - CD20

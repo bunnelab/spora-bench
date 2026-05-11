@@ -1,0 +1,7 @@
+
+
+model:
+  _target_: models.resnet.resnet.SporaResNetWrapper
+  model_name: resnet
+  pca_dim_channel: 9
+  tile_size: 224

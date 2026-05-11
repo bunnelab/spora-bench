@@ -1,0 +1,9 @@
+datasets:
+  moldoveanu2022spatially:
+    name: moldoveanu2022spatially
+    path: /path/to/datasets/moldoveanu2022spatially
+    modality: imc
+    standardization: quantile_clipping_log1p/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: False

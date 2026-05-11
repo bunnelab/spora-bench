@@ -1,0 +1,3 @@
+
+output_dir: /path/to/output/dir/
+random_seed: 42

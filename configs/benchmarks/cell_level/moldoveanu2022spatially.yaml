@@ -1,0 +1,7 @@
+datasets:
+  moldoveanu2022spatially:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: [others,]

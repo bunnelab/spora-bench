@@ -1,0 +1,7 @@
+datasets:
+  danenberg2022breast:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: ["None",]

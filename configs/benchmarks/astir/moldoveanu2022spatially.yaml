@@ -1,0 +1,41 @@
+datasets:
+  moldoveanu2022spatially:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: [others,]
+          cell_types:
+            CD31:
+             - CD31
+            macro.mono:
+             - CD14
+             - CD68
+             - HLA-DR
+            Th.ae:
+             - CD3
+             - CD4
+             - CD45RO
+            Tc.ae:
+              - CD3
+              - CD8a
+              - CD45RO
+            melano:
+              - S100
+              - SOX10
+            Tc.naive:
+              - CD3
+              - CD8a
+              - CD45RA
+              - CCR7
+            Treg:
+              - CD3
+              - CD4
+              - FoxP3
+            B:
+             - CD20
+            Th.naive:
+              - CD3
+              - CD4
+              - CD45RA
+              - CCR7

@@ -1,0 +1,26 @@
+datasets:
+  cords2024cancer:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: [Other,]
+          cell_types:
+            Fibroblast:
+              - SMA
+              - FAP
+              - CDH11
+              - Collagen I+Fibronectin
+              - VIM
+              - PDGFRB
+            Vessel:
+              - CD31+vWF
+              - LYVE-1
+            Immune:
+              - CD20
+              - CD68
+              - CD15
+            T cell:
+              - CD3e
+            Tumor:
+              - panCK

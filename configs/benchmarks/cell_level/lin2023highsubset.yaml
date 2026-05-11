@@ -1,0 +1,7 @@
+datasets:
+  lin2023highsubset:
+    benchmarks:
+      cell_level: 
+        cell_type:
+          label_col: cell_type
+          excluded_classes: [Other,]

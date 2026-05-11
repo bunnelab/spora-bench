@@ -1,0 +1,8 @@
+datasets:
+  meyer2025stratification:
+    benchmarks:
+      tissue_level:
+        PID_group_risk_merged:
+            label_col: PID_group_risk_merged
+        PID_group_risk:
+            label_col: PID_group_risk

@@ -1,0 +1,46 @@
+datasets:
+  schulz2024immucan:
+    benchmarks:
+      cell_level: 
+        cell_labels:
+          label_col: cell_labels
+          excluded_classes: [unlabelled]
+          cell_types:
+            MacCD163:
+              - CD68
+              - CD163
+            Mural:
+              - SMA
+              - PDGFRb
+            DC:
+              - HLADR
+              - CD11c
+            Tumor:
+              - Ecad
+            CD4:
+              - CD3
+              - CD4
+            HLADR:
+              - HLADR
+            NK: 
+              - CD16
+              - CD7
+            CD8:
+              - CD3
+              - CD8a
+            Treg:
+              - CD3
+              - CD4
+              - FOXP3
+            Neutrophil:
+              - CD15
+            plasma:
+              - CD38
+            B:
+              - CD20
+            pDC:
+              - HLADR
+              - CD303
+            BnT:
+              - CD3
+              - CD20

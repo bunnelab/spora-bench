@@ -1,0 +1,21 @@
+downstream_model:
+  _target_: spora_bench.downstream_models.abmil.GatedABMILClassifierWithValidation
+  hidden_dim: 256
+  num_heads: 8
+  num_branches: 4
+  patience: 10
+  dropout: 0
+  monitor: valid_loss
+
+training:
+  device: cuda
+  batch_size: 24
+  num_workers: 8
+  learning_rate: 0.0005
+  weight_decay: 0.00001
+  max_epochs: 100
+  validation_fraction: 0.2
+
+cross_validation:
+  n_splits: 5
+  random_state: 42

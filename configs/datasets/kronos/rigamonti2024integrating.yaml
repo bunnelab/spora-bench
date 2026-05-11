@@ -1,0 +1,9 @@
+datasets:
+  rigamonti2024integrating:
+    name: rigamonti2024integrating
+    path: /path/to/datasets/rigamonti2024integrating
+    modality: imc
+    standardization: quantile_clipping/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: True

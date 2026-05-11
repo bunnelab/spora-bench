@@ -1,0 +1,9 @@
+datasets:
+  phillips2021immune:
+    name: phillips2021immune
+    path: /path/to/datasets/phillips2021immune
+    modality: codex
+    standardization: quantile_clipping_log1p/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: True

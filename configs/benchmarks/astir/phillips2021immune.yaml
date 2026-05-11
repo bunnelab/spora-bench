@@ -1,0 +1,39 @@
+datasets:
+  phillips2021immune:
+    benchmarks:
+      cell_level:
+        cell_category:
+          label_col: cell_category
+          excluded_classes: []
+          cell_types:
+            B cell:
+              - CD20
+            T cell:
+              - CD3
+            Myeloid:
+              - CD68
+              - CD11b
+              - CD163
+            Epithelium:
+              - Cytokeratin
+              - MUC-1
+            Stromal:
+              - Vimentin
+              - Collagen-IV
+            Langerhans cell:
+              - CD1a
+            Vasculature:
+              - CD31
+              - Podoplanin
+            Mast cell:
+              - Mast-cell-tryptase
+            Nerve:
+              - CD56
+            Neutrophil:
+              - CD15
+              - CD16
+            Tumor:
+              - p53
+              - Cytokeratin
+              - Ki-67
+              - EGFR

@@ -1,0 +1,9 @@
+datasets:
+  danenberg2022breast:
+    name: danenberg2022breast
+    path: /path/to/datasets/danenberg2022breast
+    modality: imc
+    standardization: quantile_clipping/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: True

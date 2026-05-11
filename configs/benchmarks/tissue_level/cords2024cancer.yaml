@@ -1,0 +1,19 @@
+datasets:
+  cords2024cancer:
+    benchmarks:
+      tissue_level:
+        cancer_type:
+          label_col: cancer_type
+          excluded_classes: [nan, NSCLC, Mesotheliom, Basaloides Ca, Large cell neuroendocrine carcinoma, Large cell carcinoma, Adeno squamous cell carcinoma, None]
+        Grade:
+          label_col: grade
+          excluded_classes: [nan, None]
+        Grade_merged:
+          label_col: grade_merged
+          excluded_classes: [nan, None]
+        survival_class_ADDED:
+          label_col: survival_class_ADDED
+          excluded_classes: [nan]
+        disease_free_survival_class_ADDED:
+          label_col: disease_free_survival_class_ADDED
+          excluded_classes: [nan]

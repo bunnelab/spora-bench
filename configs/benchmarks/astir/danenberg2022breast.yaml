@@ -1,0 +1,30 @@
+datasets:
+  danenberg2022breast:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: ["None",]
+          cell_types:
+            ER-Negative Epithelial Cell:
+              - panCK
+              - CK8/18
+            ER-Positive Epithelial Cell:
+              - ER
+              - panCK
+              - CK8/18
+            T Cell:
+              - CD3e
+            Stromal Cell:
+              - SMA
+              - PDGFRB
+            Myeloid Cell:
+              - CD68
+              - CD15
+            Antigen-Presenting Cell:
+              - CD11c
+              - HLA-DR
+            Natural Killer Cell:
+              - CD57
+            B Cell or Plasma Cell:  
+              - CD20

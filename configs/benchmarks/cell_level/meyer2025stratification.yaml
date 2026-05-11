@@ -1,0 +1,7 @@
+datasets:
+  meyer2025stratification:
+    benchmarks:
+      cell_level: 
+        metacluster_tumor_combined:
+          label_col: metacluster_tumor_combined
+          excluded_classes: []

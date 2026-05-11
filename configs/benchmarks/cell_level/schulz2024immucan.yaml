@@ -1,0 +1,7 @@
+datasets:
+  schulz2024immucan:
+    benchmarks:
+      cell_level: 
+        cell_labels:
+          label_col: cell_labels
+          excluded_classes: [unlabelled]

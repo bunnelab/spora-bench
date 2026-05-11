@@ -1,0 +1,9 @@
+datasets:
+  zhuhuman2025spatial:
+    name: zhuhuman2025spatial
+    path: /path/to/datasets/zhuhuman2025spatial
+    modality: imc
+    standardization: quantile_clipping_log1p/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: False

@@ -1,0 +1,7 @@
+datasets:
+  cords2024cancer:
+    benchmarks:
+      cell_level: 
+        cell_category:
+          label_col: cell_category
+          excluded_classes: [Other,]

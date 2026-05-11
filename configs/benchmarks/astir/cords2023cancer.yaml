@@ -1,0 +1,22 @@
+datasets:
+  cords2023cancer:
+    benchmarks:
+      cell_level: 
+        celltype:
+          label_col: celltype
+          excluded_classes: [other,]
+          cell_types:
+            Immune:
+              - CD45
+            CAF:
+              - FAP
+              - SMA
+              - Vimentin
+              - Fibronectin-Collagen-I
+              - Cadherin-11
+            Tumour:
+              - Keratin-AE1-AE3
+            Endothelial:
+                - vWF-CD31
+                - CD31
+                - Podoplanin

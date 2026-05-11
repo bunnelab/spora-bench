@@ -1,0 +1,9 @@
+datasets:
+  fischer2023multiplex:
+    name: fischer2023multiplex
+    path: /path/to/datasets/fischer2023multiplex
+    modality: imc
+    standardization: quantile_clipping/uq_0.99_image
+    resolution: 1.0
+    use_mean_std: True
+    disable_quantile_mask: True

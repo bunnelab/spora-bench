@@ -1,0 +1,13 @@
+datasets:
+  danenberg2022breast:
+    benchmarks:
+      tissue_level:
+        ERStatus:
+            label_col: ERStatus
+            excluded_classes: [nan, unknown, None]
+        Grade_merged:
+            label_col: Grade_merged
+            excluded_classes: [nan, None]
+        ERBB2_pos:
+            label_col: ERBB2_pos
+            excluded_classes: [nan, unknown, None]

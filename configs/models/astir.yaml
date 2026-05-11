@@ -1,0 +1,7 @@
+model:
+  model_name: astir
+  max_epochs: 10
+  n_init: 3
+  n_init_epochs: 2
+  threshold: 0.5
+  arcsinh_cofactor: 1.0
