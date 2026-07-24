@@ -1,0 +1,6 @@
+
+model:
+  _target_: models.histoplexer.histoplexer_model.SporaHistoPlexerWrapper
+  model_name: histoplexer
+  work_dir: /path/to/scratch/external_repos
+  binarize: False

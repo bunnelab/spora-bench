@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional
+from typing import Dict, Iterable, List, Tuple, Optional
 import torch
 from spora_io.datasets import MultiplexImagingDataset, MultiplexTissue
 
@@ -77,3 +77,45 @@ class SporaModelWrapper(ABC):
             torch.Tensor: The predicted single-marker image. Shape: (1, H, W)
         """
         raise NotImplementedError("Inpainting is not implemented for this model.")
+
+    def predict_markers_from_he(self,
+                                he_tile: torch.Tensor,
+                                target_markers: Optional[Iterable[str]] = None,
+                                ) -> Dict[str, torch.Tensor]:
+        """
+        Predict marker maps from an H&E tile alone (no multiplex input required).
+        Unlike `predict_marker`, this is for models that translate H&E directly into
+        multiplex marker channels (e.g. ROSIE, HistoPlexer, GigaTIME), rather than
+        inpainting a dropped multiplex channel from the remaining multiplex channels.
+
+        Implementations should canonicalize their native channel vocabulary into the
+        shared marker tokens used across models/datasets (see
+        `spora_bench.utils.virtual_staining_utils.canon`/`build_marker_index`), and are
+        expected to expose the canonical markers they support via a `supported_he_markers`
+        attribute (a set of canonical marker name strings) set in `__init__`, so callers can
+        compute the scored marker set without running inference.
+
+        Args:
+            he_tile (torch.Tensor): Imagenet-normalized H&E tile. Shape: (3, H, W)
+            target_markers (Optional[Iterable[str]]): Canonical marker names to restrict/optimize
+                prediction for. Implementations may ignore this and return every marker they support.
+        Returns:
+            Dict[str, torch.Tensor]: Canonical marker name -> predicted map. Shape of each value: (H, W)
+        """
+        raise NotImplementedError("H&E-to-marker prediction is not implemented for this model.")
+
+    def predict_markers_from_he_batch(self,
+                                      he_tiles: List[torch.Tensor],
+                                      target_markers: Optional[Iterable[str]] = None,
+                                      ) -> List[Dict[str, torch.Tensor]]:
+        """
+        Predict marker maps for a batch of H&E tiles. Default implementation loops over
+        `predict_markers_from_he` one tile at a time; override for models that benefit from
+        batching inference across tiles (e.g. patch-based models like ROSIE).
+        Args:
+            he_tiles (List[torch.Tensor]): Imagenet-normalized H&E tiles, each of shape (3, H, W).
+            target_markers (Optional[Iterable[str]]): See `predict_markers_from_he`.
+        Returns:
+            List[Dict[str, torch.Tensor]]: One canonical-marker-name -> predicted map dict per input tile.
+        """
+        return [self.predict_markers_from_he(t, target_markers=target_markers) for t in he_tiles]

@@ -1,0 +1,9 @@
+
+model:
+  _target_: models.rosie.rosie_model.SporaROSIEWrapper
+  model_name: rosie
+  half: True
+  grid_stride: 8
+  batch_size: 256
+  num_workers: 8
+  exclude_bg: False
