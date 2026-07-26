@@ -3,8 +3,8 @@ datasets:
     name: hickey2023organization
     path: /path/to/datasets/hickey2023organization
     modality: codex
-    standardization: quantile_clipping/uq_0.99_image
-    resolution: 1.0
+    standardization: identity
+    resolution: 0.37744
     use_mean_std: False
     disable_quantile_mask: True
     replace_nuclear_uniprot_ids: True
