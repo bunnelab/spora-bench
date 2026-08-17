@@ -1,8 +1,8 @@
 from typing import Optional, Tuple
 
 import torch
-from einops import rearrange
 from loguru import logger
+from einops import rearrange
 from safetensors.torch import load_file
 from spora_io import MultiplexImagingDataset
 from spora_io.datasets._types import MultiplexTissue
@@ -41,8 +41,6 @@ class SporaVirTuesWrapper(SporaModelWrapper):
         self.tile_size = tile_size
 
         self.model = MultiplexVirtues(
-            use_default_config = False,
-            custom_config = None,
             prior_bias_embeddings=marker_embeddings,
             prior_bias_embedding_type='esm',
             prior_bias_embedding_fusion_type='add',
@@ -203,16 +201,16 @@ class SporaVirTuesWrapper(SporaModelWrapper):
         rcoords = list(range(0, H-self.tile_size+1, stride)) + [H-self.tile_size] if (H - self.tile_size) % stride != 0 else list(range(0, H-self.tile_size+1, stride))
         ccoords = list(range(0, W-self.tile_size+1, stride)) + [W-self.tile_size] if (W - self.tile_size) % stride != 0 else list(range(0, W-self.tile_size+1, stride))
 
-        tgt = torch.zeros((H, W), dtype=torch.float32)
-        num_terms = torch.zeros_like(tgt)
+        out = torch.zeros((H, W), dtype=torch.float32)
+        num_terms = torch.zeros_like(out)
 
         for row, col in [(row, col) for row in rcoords for col in ccoords]:
             chunk = x[:, row:row+self.tile_size, col:col+self.tile_size]
             with torch.amp.autocast(device_type='cuda', dtype=torch.float16):
                 output = self.model.forward([chunk], [marker_indices], [mask])
             predicted_marker = output.decoded_multiplex[0][0].cpu() # (H,W)
-            tgt[row:row+self.tile_size, col:col+self.tile_size] += predicted_marker
+            out[row:row+self.tile_size, col:col+self.tile_size] += predicted_marker
             num_terms[row:row+self.tile_size, col:col+self.tile_size] += 1
         
-        tgt /= num_terms
-        return tgt.unsqueeze(0) # (1, H, W)
+        out /= num_terms
+        return out.unsqueeze(0) # (1, H, W)
