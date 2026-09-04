@@ -75,5 +75,16 @@ class SporaModelWrapper(ABC):
             target_uniprot_id (str): The uniprot ID of the target channel to be inpainted.
         Returns:
             torch.Tensor: The predicted single-marker image. Shape: (1, H, W)
+        Raises:
+            MarkerNotSupportedError: If the target uniprot ID is not supported by the model.
         """
         raise NotImplementedError("Inpainting is not implemented for this model.")
+
+
+
+
+class MarkerNotSupportedError(Exception):
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

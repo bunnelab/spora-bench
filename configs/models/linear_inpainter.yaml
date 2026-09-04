@@ -1,0 +1,4 @@
+model:
+  _target_: models.linear.linear_inpainter.LinearRegressionInpainter
+  model_name: linear_inpainter
+  checkpoint_path: null

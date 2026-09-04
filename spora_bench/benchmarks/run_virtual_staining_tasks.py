@@ -11,6 +11,7 @@ import torch
 
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_io.datasets import MultiplexImagingDataset, MultiplexTissue
+from spora_bench.wrapper import MarkerNotSupportedError
 from tqdm import tqdm
 
 def run_virtual_stainings(config): 
@@ -46,9 +47,23 @@ def run_virtual_stainings(config):
         test_tissue_ids = dataset.tissue_modality_metadata[dataset.tissue_modality_metadata['split'] == 'test'].index.values
 
         for tissue_id in tqdm(test_tissue_ids, desc=f"Processing tissues for dataset {dataset_key}"):
-            
-            tissue = dataset.get_tissue(tissue_id, kind="uniprot_filtered", preprocess=True, image_mode="CHW")
 
+            tissue = dataset.get_tissue(tissue_id, kind="uniprot_filtered", preprocess=True, image_mode="CHW")
+            
+            if tissue.image.shape[1] < 256 or tissue.image.shape[2] < 256:
+                logger.warning(f"Tissue {tissue_id} has image size {tissue.image.shape[1:]} which is smaller than 256x256. Skipping this tissue.")
+                continue
+
+            logger.info(f"Processing tissue: {tissue_id} with {len(tissue.channel_names)} channels.")
+            
+            if getattr(config, "rescale", False):
+                x = tissue.image # (C, H, W)
+                max_channel_values = x.reshape(x.shape[0], -1).max(dim=1).values
+                min_channel_values = x.reshape(x.shape[0], -1).min(dim=1).values
+                x = (x - min_channel_values[:, None, None]) / (max_channel_values[:, None, None] - min_channel_values[:, None, None])
+                tissue.image = x
+            
+            
             for cidx in range(len(tissue.channel_names)):
                 channel_to_predict = tissue.channel_names[cidx]
                 uniprot_to_predict = tissue.uniprot_ids[cidx]
@@ -69,12 +84,21 @@ def run_virtual_stainings(config):
                     image_loading_mask=tissue.image_loading_mask & ~bmask_to_drop_mapped_to_image_loading_mask,
                 )
 
-                virtual_stain = spora_model.predict_marker(tissue_without_channel, target_channel_name=channel_to_predict, target_uniprot_id=uniprot_to_predict)
-                
+                try:
+                    virtual_stain = spora_model.predict_marker(tissue_without_channel, target_channel_name=channel_to_predict, target_uniprot_id=uniprot_to_predict)
+                except MarkerNotSupportedError as e:
+                    logger.warning(f"Skipping tissue {tissue_id} for channel {channel_to_predict} due to error: {e}")
+                    continue
+                    
                 corr = np.corrcoef(channel_true.flatten(), virtual_stain.flatten())[0, 1].item()
-                correlations[channel_to_predict].append(corr)
+                # Correlation can be nan if the true channel is constant (e.g., due to clipping).
+                if np.isnan(corr):
+                    logger.warning(f"Correlation is NaN for tissue {tissue_id} and channel {channel_to_predict}. Skipping this tissue-channel pair.")
+                else:
+                    correlations[channel_to_predict].append(corr)
                 mses[channel_to_predict].append(((channel_true.flatten() - virtual_stain.flatten())**2).mean().item())
-
+                
+                
         avg_correlations = {channel: np.mean(corrs) for channel, corrs in correlations.items()}
         avg_mses = {channel: np.mean(mse_list) for channel, mse_list in mses.items()}
         results = []
