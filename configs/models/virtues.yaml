@@ -3,8 +3,8 @@
 model:
   _target_: models.virtues.virtues_model.SporaVirTuesWrapper
   model_name: virtues
-  checkpoint_path: /path/to/model.safetensors
-  marker_embeddings_dir: /mnt/aimm/scratch/datasets_v2/marker_embeddings/esm2_t30_150M_UR50D
+  checkpoint_path: /path/to/model_weights/virtues/model.safetensors
+  marker_embeddings_dir: /path/to/marker_embeddings/esm2_t30_150M_UR50D
   tile_size: 128
-  segmentation_checkpoint_path: /path/to/model.safetensors
+  segmentation_checkpoint_path: /path/to/segmentation_checkpoint/model.safetensors
   num_classes: 9
