@@ -12,7 +12,7 @@ except Exception as e:
     from sklearn.linear_model import LogisticRegression
 
 from loguru import logger
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from spora_bench.utils.evaluation_utils import (bootstrap_classification_report,
