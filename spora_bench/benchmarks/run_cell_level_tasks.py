@@ -29,11 +29,11 @@ from spora_bench.utils.tissue_level_utils import get_patient_splits
 
 
 def run_linear_probes(
-        config: OmegaConf
+        config: DictConfig
         ):
     """Evaluate the model on cell-level benchmarks using linear probes. If cell tokens have been computed previously, we load them from this location: {config.output_dir}/{model_name}/cell_tokens/{dataset_key}.h5ad.
     Args: 
-        config: The configuration object containing model, training and dataset information.
+        config: The configuration object containing model, dataset and benchmark information.
     """
     output_dir = Path(config.output_dir)
     results_dir = output_dir / config.model.model_name / 'results'
@@ -77,7 +77,7 @@ def run_linear_probes(
             task_config = dataset_config.benchmarks.cell_level[task_name]
             label_col = task_config.label_col
             excluded_classes = task_config.excluded_classes
-            logger.info(f'Running cell typing benchmark for label column: {label_col} with excluded classes: {excluded_classes}')
+            logger.info(f'Running cell level benchmark for label column: {label_col} with excluded classes: {excluded_classes}')
 
             # apply NA filter and exclude classes filter
             train_adata = base_train_adata.copy() # copy to avoid modifying the original adata which is used for multiple tasks
@@ -131,7 +131,7 @@ def run_linear_probes(
             cm = pd.DataFrame(cm, index=unique_classes, columns=unique_classes)
             cm.to_parquet(results_dir / f'{dataset_name}_{task_name}_confusion_matrix.parquet')
 
-            logger.info(f'Finished cell typing benchmark for dataset {dataset_name} and label column {task_name}. Results saved to {results_dir}')
+            logger.info(f'Finished cell-level benchmark for dataset {dataset_name}, task {task_name} and label column {label_col}. Results saved to {results_dir}')
 
 
 if __name__ == "__main__":

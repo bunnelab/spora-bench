@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 from hydra.utils import instantiate
 from loguru import logger
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.preprocessing import LabelEncoder
@@ -23,7 +23,7 @@ from spora_bench.utils.tissue_level_utils import (
 
 
 def run_spora_split_validation(
-        config: OmegaConf
+        config: DictConfig
         ):
     """Evaluate the model on the spora-io train-test splits for each dataset that contains tissue-level benchmarks. If tile tokens have been computed previously, we load them from this location: {config.output_dir}/{model_name}/tile_tokens/{dataset_key}.
     Args: 

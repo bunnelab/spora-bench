@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from loguru import logger
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from hydra.utils import instantiate
 from collections import defaultdict
 
@@ -14,7 +14,7 @@ from spora_io.datasets import MultiplexImagingDataset, MultiplexTissue
 from spora_bench.wrapper import MarkerNotSupportedError
 from tqdm import tqdm
 
-def run_virtual_stainings(config): 
+def run_virtual_stainings(config: DictConfig): 
 
     output_dir = Path(config.output_dir)
     results_dir = output_dir / config.model.model_name / 'results'
