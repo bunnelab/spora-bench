@@ -20,6 +20,15 @@ class SporaEvaWrapper(SporaModelWrapper):
                  tile_size: int = 224,
                  patch_size: int = 8,
                  ):
+        """
+        Args:
+            model_name: Name of the model.    
+            eva_config_path: Path to the Eva model configuration file.
+            uniprot_mapping_path: Path to the parquet file containing the mapping from uniprot. DataFrame should have two columns: 'uniprot_id' and 'gene_name'.
+            tile_size: Size of the input tile for the model.
+            patch_size: Size of the patches for the model.
+        """
+    
         super().__init__(model_name=model_name)
 
         self.uniprot_to_gene = pd.read_parquet(uniprot_mapping_path).set_index('uniprot_id').to_dict()['gene_name']
