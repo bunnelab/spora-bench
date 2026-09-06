@@ -5,6 +5,7 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+ignore/
 
 submit/
 # C extensions
