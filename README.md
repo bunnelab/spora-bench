@@ -207,6 +207,8 @@ Our repository contains implementations of two spatial proteomics foundation mod
 | VirTues | `configs/models/virtues.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
 | KRONOS | `configs/models/kronos.yaml` | in-cohort cell phenotyping via linear probing and tissue-level task |
 | ResNet | `configs/models/resnet.yaml` | only tissue-level task |
+| Linear Inpainter | `configs/models/linear_inpainter.yaml | only virtual staining tasks |
+| Eva | `configs/models/eva.yaml` | only virtual staining tasks |
 | astir | `configs/models/astir.yaml` | only cell phenotyping |
 | MAPS | `configs/models/maps.yaml` | only cross-cohort cell-type annotation (via separate pipeline) | 
 
