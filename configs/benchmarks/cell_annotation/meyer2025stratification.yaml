@@ -1,7 +1,7 @@
 datasets:
-  hoch2022multiplexed:
+  meyer2025stratification:
     benchmarks:
-      cell_typing: 
+      cell_annotation: 
         cell_type_atlas:
           label_col: cell_type_atlas
           class_order:

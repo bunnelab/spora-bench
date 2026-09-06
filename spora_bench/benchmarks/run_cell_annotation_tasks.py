@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_io.datasets import MultiplexImagingDataset
-from spora_bench.utils.instance_segmentation_utils import compute_matches
+from spora_bench.utils.segmentation_utils import compute_matches
 from sklearn.preprocessing import LabelEncoder
 from spora_bench.utils.evaluation_utils import (bootstrap_classification_report,
     transform_bootstrap_report_to_df,
@@ -18,7 +18,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 from hydra.utils import instantiate
 
-def run_cell_typing(
+def run_cell_annotation(
         config: DictConfig
     ):
     """
@@ -57,9 +57,9 @@ def run_cell_typing(
         cell_metadata = cell_metadata[cell_metadata['tissue_id'].isin(test_tissue_ids)]
         cell_metadata_per_tissue_id = {tissue_id: tissue_df.set_index('cell_id') for tissue_id, tissue_df in cell_metadata.groupby('tissue_id')}
 
-        for task_name in dataset_config.benchmarks.cell_typing.keys():
+        for task_name in dataset_config.benchmarks.cell_annotation.keys():
 
-            task_config = dataset_config.benchmarks.cell_typing[task_name]
+            task_config = dataset_config.benchmarks.cell_annotation[task_name]
             label_col = task_config.label_col
             class_order = task_config.class_order # list of classes
             label_encoder = LabelEncoder()
@@ -142,4 +142,4 @@ if __name__ == "__main__":
     logger.info(f'Config: \n{OmegaConf.to_yaml(config)}')
 
     set_seed(config.random_seed)
-    run_cell_typing(config)
+    run_cell_annotation(config)

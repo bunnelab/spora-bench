@@ -9,13 +9,13 @@ from collections import defaultdict
 
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_io.datasets import MultiplexImagingDataset
-from spora_bench.utils.instance_segmentation_utils import compute_matches
+from spora_bench.utils.segmentation_utils import compute_matches
 
 from hydra.utils import instantiate
 
 THRESHOLDS = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
-def run_instance_segmentations(
+def run_segmentations(
         config: DictConfig
     ):
     """
@@ -133,4 +133,4 @@ if __name__ == "__main__":
     logger.info(f'Config: \n{OmegaConf.to_yaml(config)}')
 
     set_seed(config.random_seed)
-    run_instance_segmentations(config)
+    run_segmentations(config)

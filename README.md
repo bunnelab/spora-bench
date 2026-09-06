@@ -4,7 +4,7 @@
 # Introduction
 **spora [bench]** is a benchmark for spatial proteomics foundation models. Building upon the unified dataset of **[spora [data]](TBD)** and the data interface **[spora [io]](https://github.com/bunnelab/spora-io)**, it provides standardized evaluation tasks and protocols to assess and compare spatial proteomics foundation models across scales: 
 
-At the *subcellular-level* virtual staining assess a model's learnt understanding of complex marker co-localization patterns. At the *cell-level*, coarse- and fine-grained cell phenotyping tasks evaluate the local biological information content captured by representations via standardized logistic regression. At the *tissue-level*, pathology tasks (cancer grading, subtyping and treatment response prediction), test a model's abilities to capture clinically relevant local and global tissue features. 
+At the *subcellular-level* virtual staining assess a model's learnt understanding of complex marker co-localization patterns. At the *cell-level*, coarse- and fine-grained cell phenotyping tasks evaluate the local biological information content captured by representations via standardized logistic regression. Cell instance segmentation and annotation benchmarks assess how well these representations generalize to unseen datasets. At the *tissue-level*, pathology tasks (cancer grading, subtyping and treatment response prediction), test a model's abilities to capture clinically relevant local and global tissue features. 
 
 For more information about **spora**, please also refer to the following ressources:
 1. Our paper *To be announced*
@@ -40,11 +40,13 @@ Datasets can be downloaded using `rclone`. For detailed instructions, please ref
 
 ## Overview of benchmark pipelines
 
-**spora [bench]** consists of three benchmark pipelines:
+**spora [bench]** consists of five benchmark pipelines:
 
-1. `run_cell_level_tasks` for cell phenotyping tasks,
-2. `run_tissue_level_tasks` for tissue-level pathology tasks, and
-3. `run_virtual_staining_tasks` for virtual staining tasks.
+1. `run_cell_probe_tasks` for in-cohort cell phenotyping tasks using linear probes,
+2. `run_segmentation_tasks` for cross-cohort cell instance segmentation tasks,
+3. `run_cell_annotation_tasks` for cross-cohort cell annotation tasks,
+4. `run_tissue_level_tasks` for tissue-level pathology tasks, and
+5. `run_virtual_staining_tasks` for virtual staining tasks.
 
 These pipelines are configured and executed using a modular system of `.yaml` configuration files. We distinguish between four types of configuration files:
 
@@ -53,7 +55,7 @@ These pipelines are configured and executed using a modular system of `.yaml` co
 3. The `datasets_config` stores all information and parameters required to instantiate the target datasets, e.g., storage locations and standardization settings.
 4. The `benchmarks_config` stores all information about which tasks to run for each dataset.
 
-## Quick Configuration
+## Quick configuration
 
 For the purpose of simply running the benchmarks listed in the paper, all required `.yaml` configurations are provided in `configs/`, and only a few path variables need to be updated:
 
@@ -61,27 +63,53 @@ For the purpose of simply running the benchmarks listed in the paper, all requir
 2. In all dataset configs (e.g. `configs/datasets/virtues/cords2023cancer.yaml`), update the `path` field to point to the root directory of the respective dataset.
 3. In the model config (e.g. `configs/models/virtues.yaml`), update all required model-specific path variables (e.g. `checkpoint_path` and `marker_embeddings_dir` for VirTues; `checkpoint_path` and `marker_metadata_path` for KRONOS).
 
-## Cell phenotyping
+## In-cohort cell phenotyping via linear probes
+
+The first benchmark pipeline `run_cell_probe_tasks` aims to evaluate the quality of cell-level representations using in-cohort linear probes for cell phenotyping.
 
 ### Starting an individual benchmark
 
 To execute cell phenotyping benchmarks, run:
 ```
-python -m spora_bench.benchmarks.run_cell_level_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config> benchmarks_config=<path-to-benchmarks-config>
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config> benchmarks_config=<path-to-benchmarks-config>
 ```
 Results (confusion matrix, classification report, and bootstrapped classification report) will be saved to `output_dir/<model-name>/results`.
 
 To give an example, the following command runs the cell phenotyping benchmark for VirTues on the `hoch2022multiplexed` dataset:
 ```
-python -m spora_bench.benchmarks.run_cell_level_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_level/hoch2022multiplexed.yaml
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_level/hoch2022multiplexed.yaml
 ```
 **Note:** Some models, for instance KRONOS, might require distinct dataset configs to account for differences in standardization procedures. For KRONOS you find the default dataset configs in `configs/datasets/kronos/`.
 
 ### Batched submission of benchmark tasks
 To run multiple benchmarks at once, you may pass to `datasets_config` and `benchmarks_config` not only a single path but also paths containing wildcards and lists of paths. For instance, to run all cell phenotyping tasks for VirTues, execute
 ```
-python -m spora_bench.benchmarks.run_cell_level_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_level
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_level
 ```
+
+## Cross-cohort cell instance segmentation
+The benchmark pipeline `run_segmentation_tasks` evaluates a segmentation model to segment individual cell instances.
+
+**Important:** To assess cross-cohort generalization, it is the responsibility of the user to ensure that the segmentation model has not seen the target datasets during supervised training.
+
+To execute cell instance segmentation benchmarks, run:
+```
+python -m spora_bench.benchmarks.run_segmentation_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config>
+```
+No additional `benchmarks_config` is required.
+
+Batched submissions of datasets are possible via lists or wildcards.
+
+## Cross-cohort cell-type annotation
+In practice, new datasets are generated without prior labels, and their annotation thus requires phenotyping methods that generalize across cohorts with varying measured markers. The benchmark pipeline `run_cell_annotation_tasks` assess the cross-cohort generalization ability of such annotation methods.
+
+**Important:** To assess cross-cohort generalization, it is the responsibility of the user to ensure that the annotation method has not seen the target datasets during supervised training.
+
+To execute cell annotation benchmarks, run:
+```
+python -m spora_bench.benchmarks.run_cell_annotation_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config> benchmarks_config=<path-to-benchmarks-config>
+```
+Batched submissions of datasets and benchmarks are possible via lists or wildcards.
 
 ## Tissue-level pathology tasks
 Similarly to the cell phenotyping tasks, tissue-level benchmarks are executed via the command:
@@ -95,6 +123,7 @@ python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=configs/mod
 Similar to the cell phenotyping pipeline, batched submission of datasets and benchmark configs is possible via lists or wildcards.
 
 ## Virtual staining tasks
+
 Virtual staining tasks can be executed via the following command:
 ```
 python -m spora_bench.benchmarks.run_virtual_staining_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config>
@@ -109,11 +138,12 @@ Finally, baseline auto-correlation values between markers can be computed:
 ```
 python -m spora_bench.tools.compute_correlations dataset_config=<path-to-datasets-config>
 ```
+
 # 📋 Task Zoo
 
 In the following you find a lists benchmark tasks, for which results are reported in our paper.
 
-## Cell phenotyping tasks
+## In-cohort cell phenotyping via linear probing tasks 
 | Dataset |  Dataset config (VirTues) | Benchmark config |
 | --- | --- | --- | 
 | cords2023cancer | `configs/datasets/virtues/cords2023cancer.yaml` | `configs/benchmarks/cell_level/cords2023cancer.yaml` |
@@ -127,8 +157,33 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | schulz2024immucan |  `configs/datasets/virtues/schulz2024immucan.yaml` | `configs/benchmarks/cell_level/schulz2024immucan.yaml` | 
 | wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_level/wang2023spatial.yaml` | 
 
-## Tissue level tasks
+## Cross-cohort cell instance segmentation tasks
+| Dataset |  Dataset config (VirTues) |
+| --- | --- |
+| cords2023cancer | `configs/datasets/virtues/cords2023cancer.yaml` |
+| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` |
+| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` |
+| schulz2024immucan |  `configs/datasets/virtues/schulz2024immucan.yaml` |
+| moldoveanu2022spatially | `configs/datasets/virtues/moldoveanu2022spatially.yaml` |
+| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` |
+| lin2023highsubset | `configs/datasets/virtues/lin2023highsubset.yaml` |
+| rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` |
+
+## Cross-cohort cell-type annotation
 | Dataset |  Dataset config (VirTues) | Benchmark config |
+| --- | --- | --- | 
+| cords2023cancer | `configs/datasets/virtues/cords2023cancer.yaml` | `configs/benchmarks/cell_annotation/cords2023cancer.yaml` | 
+| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_annotation/cords2024cancer.yaml` | 
+| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_annotation/danenberg2022breast.yaml` | 
+| schulz2024immucan |  `configs/datasets/virtues/schulz2024immucan.yaml` | `configs/benchmarks/cell_annotation/schulz2024immucan.yaml` |
+| moldoveanu2022spatially | `configs/datasets/virtues/moldoveanu2022spatially.yaml` | `configs/benchmarks/cell_annotation/moldoveanu2022spatially.yaml` |
+| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_annotation/meyer2025stratification.yaml` |
+| lin2023highsubset | `configs/datasets/virtues/lin2023highsubset.yaml` | `configs/benchmarks/cell_annotation/lin2023highsubset.yaml` |
+| rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` | `configs/benchmarks/cell_annotation/rigamonti2024integrating.yaml` |
+
+
+## Tissue level tasks
+| Dataset |  Dataset config (VirTues) |
 | --- | --- | --- | 
 | cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_level/cords2024cancer.yaml` |
 | danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_level/danenberg2022breast.yaml` |
@@ -149,12 +204,13 @@ In the following you find a lists benchmark tasks, for which results are reporte
 Our repository contains implementations of two spatial proteomics foundation models, a ResNet baseline and astir:
 | Model | Model config | Supported Tasks |
 | --- | --- | --- |
-| VirTues | `configs/models/virtues.yaml` | cell phenotyping, tissue-level task and virtual staining |
-| KRONOS | `configs/models/kronos.yaml` | cell phenotyping and tissue-level task |
+| VirTues | `configs/models/virtues.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
+| KRONOS | `configs/models/kronos.yaml` | in-cohort cell phenotyping via linear probing and tissue-level task |
 | ResNet | `configs/models/resnet.yaml` | only tissue-level task |
 | astir | `configs/models/astir.yaml` | only cell phenotyping |
+| MAPS | `configs/models/maps.yaml` | only cross-cohort cell-type annotation (via separate pipeline) | 
 
-**Note:** To run astir, we provide a separate pipeline `spora_bench/benchmarks/run_astir.py` for which benchmark configs are located in `configs/benchmarks/astir`.
+**Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/astir` and `configs/benchmarks/maps`.
 
 # 🛠️ Setting up new datasets, tasks and models
 spora [bench] is designed to be modular benchmark system that can be easily extended by new datasets, tasks and models.
@@ -177,9 +233,9 @@ For examples, please refer to `configs/datasets/virtues`.
 The benchmark pipeline can also be applied to novel or proprietary datasets not contained in spora [data], provided they are processed into the standardized format defined by spora [data]. For detailed formatting instructions, please refer to the spora [data] documentation.
 
 ## Setting up a new benchmark
-To setup a new cell phenotyping or tissue-level benchmark task, simply create a `.yaml` benchmark config in one of the following two formats. Virtual staining task do not require additional setup of configs. 
+To setup a new cell phenotyping or tissue-level benchmark task, simply create a `.yaml` benchmark config in one of the following two formats. Cell segmentation and virtual staining tasks do not require additional setup of configs. 
 
-### Cell-phenotyping tasks
+### In-cohort cell phenotyping via linear probing
 ```
 datasets:
   <dataset_name>:
@@ -189,6 +245,19 @@ datasets:
           label_col: <column_name>
           excluded_classes: <list of classes to exclude>
 ```
+
+### Cross-cohort cell-type annotation
+```
+datasets:
+  <dataset_name>:
+    benchmarks:
+      cell_annotation: 
+        <task_name>:
+          label_col: <column_name>
+          class_order: <list of classes (by name) predicted by method with order corresponding to predicted class indicies>
+          excluded_classes: <list of classes (by name) to exclude from evaluation>
+```
+
 ### Tissue-level pathology tasks
 ```
 datasets:
@@ -209,10 +278,12 @@ We provide a model wrapping class `spora_bench.wrapper.SporaModelWrapper` that d
 
 | Method | Benchmarks Requiring Implementation | 
 | --- | --- | 
-| `compute_cell_tokens` | cell phenotyping | 
+| `compute_cell_tokens` | in-cohort cell phenotyping via linear probing | 
 | `embed_tissue` | tissue-level | 
 | `postprocess_tile_embeddings` | tissue-level (optional) | 
 | `predict_marker` | virtual staining |
+| `predict_instance_segmentation` | cross-cohort cell instance segmentation |
+| `predict_cell_types` | cross-cohort cell-type annotation |
 
 For details on the expected input arguments and return types of these methods, please refer to our documentation or the `SporaModelWrapper` class itself.
 
