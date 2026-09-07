@@ -18,6 +18,16 @@ from spora_bench.utils.intensities_utils import compute_mean_intensities
 
 from spora_io import MultiplexImagingDataset
 
+"""
+Note on astir's evaluation:
+Dealing with excluded classes in astir is a bit tricky. Astir has two special classes: "Unknown" and "Other".
+With the label option `excluded_classes` we can remove samples assigned to these classes from the (training [does not matter] and ) test set.
+This should not constitute a bias in the evaluation as long as other methods are also not evaluated on these ground truth samples (e.g. by excluding them in classification_report(...,labels=...)).
+
+We can disable the prediction of astir's special class `Unknown` by setting the threshold to 0.0. However, astir might still predict `Other` for some cells, leading to an increase count of false negatives. 
+This is a limitation of astir's model and should be taken into account when interpreting the results. This prediction could only be avoided by modifying the astir source code, which is out of scope for this benchmark.
+"""
+
 def run_astir(config: DictConfig):
     """
     Runs astir for each dataset and cell-level benchmark task specified in the configuration, evaluates the results and saves them to disk.

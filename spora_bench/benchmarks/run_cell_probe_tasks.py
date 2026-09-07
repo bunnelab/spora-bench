@@ -20,8 +20,6 @@ from spora_bench.utils.evaluation_utils import (bootstrap_classification_report,
     transform_classification_report_to_df)
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_bench.tools.compute_cell_tokens import compute_cell_tokens
-from spora_bench.utils.evaluation_utils import (
-    transform_bootstrap_report_to_df, transform_classification_report_to_df)
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_bench.utils.tissue_level_utils import get_patient_splits
 
