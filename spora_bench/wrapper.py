@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Dict, Iterable, List, Tuple, Optional
 import torch
-from spora_io.datasets import MultiplexImagingDataset, MultiplexTissue
+from spora_io.datasets import MultiplexImagingDataset, MultiplexTissue, CellMask
 
 
 class SporaModelWrapper(ABC):
@@ -10,10 +10,11 @@ class SporaModelWrapper(ABC):
     def __init__(self, model_name: str):
         self.model_name = model_name
 
+
     def compute_cell_tokens(self,
                             dataset: MultiplexImagingDataset,
                             tissue_id: str,
-                            ):
+                            ) -> torch.Tensor:
         """
         Compute cell tokens for the given dataset and tissue ID.
         Args:
@@ -24,9 +25,10 @@ class SporaModelWrapper(ABC):
         """
         raise NotImplementedError("Cell token computation is not implemented for this model.")
 
+
     def embed_tile(self,
                    tissue: MultiplexTissue
-                   ):
+                   ) -> torch.Tensor:
         """
         Embed a tile from the input image.
         Args:
@@ -35,6 +37,7 @@ class SporaModelWrapper(ABC):
             torch.Tensor: The embedded tile tensor. Shape: (D,)
         """
         raise NotImplementedError("Tile embedding is not implemented for this model.")
+
     
     def embed_tissue(self,
                      dataset: MultiplexImagingDataset,
@@ -51,6 +54,7 @@ class SporaModelWrapper(ABC):
             torch.Tensor: A sequence-shaped embedding of the tissue. Shape: (N,D)
         """
         raise NotImplementedError("Tissue embedding is not implemented for this model.")
+
     
     def postprocess_tile_embeddings(self, tissue_embedding: torch.Tensor):
         """
@@ -62,11 +66,12 @@ class SporaModelWrapper(ABC):
         """
         return tissue_embedding
 
+
     def predict_marker(self,
                       tissue:  MultiplexTissue,
                       target_channel_name: str,
                       target_uniprot_id: Optional[str] = None,
-                      ):
+                      ) -> torch.Tensor:
         """
         Predict a target marker given multipelxed input image.
         Args:
@@ -75,6 +80,29 @@ class SporaModelWrapper(ABC):
             target_uniprot_id (str): The uniprot ID of the target channel to be inpainted.
         Returns:
             torch.Tensor: The predicted single-marker image. Shape: (1, H, W)
+        Raises:
+            MarkerNotSupportedError: If the target uniprot ID is not supported by the model.
+        """
+        raise NotImplementedError("Inpainting is not implemented for this model.")
+
+
+    def predict_instance_segmentation(self,
+                                      tissue: MultiplexTissue,
+                                      ) -> torch.Tensor:
+        """
+        Predicts the instance segmentation mask for the given tissue. Cell instances are enumerated with unique integers starting from 1.
+        Args:
+            tissue (MultiplexTissue): The input multiplexed tissue. Shape: (C, H, W)
+        Returns:
+            torch.Tensor: The predicted instance segmentation mask. Shape: (H, W)
+        """
+        raise NotImplementedError("Instance segmentation is not implemented for this model.")
+    
+    def predict_cell_types(self,
+                           tissue: MultiplexTissue,
+                           mask: CellMask,
+                           exclude_classes: Optional[List[str]] = None,
+                           ) -> torch.Tensor:
         """
         raise NotImplementedError("Inpainting is not implemented for this model.")
 
@@ -119,3 +147,20 @@ class SporaModelWrapper(ABC):
             List[Dict[str, torch.Tensor]]: One canonical-marker-name -> predicted map dict per input tile.
         """
         return [self.predict_markers_from_he(t, target_markers=target_markers) for t in he_tiles]
+        Predicts the cell types for the given tissue. Cell types are enumerated with unique integers starting from 1.
+        Args:
+            tissue (MultiplexTissue): The input multiplexed tissue. Shape: (C, H, W)
+            mask (CellMask): The input cell mask. Shape: (H, W)
+            exclude_classes (List[str]): A list of cell types to exclude.
+        Returns:
+            torch.Tensor: The predicted cell type class ids for each cell instance in the mask. Shape: (num_cells,) where num_cells is the number of unique cells in the mask.
+        """
+        raise NotImplementedError("Cell type prediction is not implemented for this model.")
+
+
+
+class MarkerNotSupportedError(Exception):
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

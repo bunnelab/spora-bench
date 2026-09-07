@@ -1,0 +1,9 @@
+
+model:
+  _target_: models.eva.eva_model.SporaEvaWrapper
+  model_name: eva
+  eva_config_path: /path/to/Eva/config.yaml
+  uniprot_mapping_path: /path/to/mapping.parquet
+  tile_size: 224
+  patch_size: 8
+

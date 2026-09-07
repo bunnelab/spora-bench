@@ -1,0 +1,17 @@
+datasets:
+  danenberg2022breast:
+    benchmarks:
+      cell_annotation: 
+        cell_type_atlas:
+          label_col: cell_type_atlas
+          class_order:
+          - 'None'
+          - 'B cell'
+          - 'CD4 T cell'
+          - 'CD8 T cell'
+          - 'Fibroblasts /Stroma'
+          - 'Myeloid'
+          - 'Tumor'
+          - 'Unknown'
+          - 'Vessel / Endo.'
+          excluded_classes: ['None','Unknown']

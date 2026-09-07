@@ -5,6 +5,7 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+ignore/
 
 submit/
 # C extensions
@@ -220,3 +221,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 figures/
+notebooks/
