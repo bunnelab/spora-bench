@@ -183,8 +183,8 @@ In the following you find a lists benchmark tasks, for which results are reporte
 
 
 ## Tissue level tasks
-| Dataset |  Dataset config (VirTues) |
-| --- | --- | --- | 
+| Dataset |  Dataset config (VirTues) | Benchmark config | 
+| --- | --- | --- |
 | cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_level/cords2024cancer.yaml` |
 | danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_level/danenberg2022breast.yaml` |
 | fischer2023multiplex | `configs/datasets/virtues/fischer2023multiplex.yaml` | `configs/benchmarks/cell_level/fischer2023multiplex.yaml` |
