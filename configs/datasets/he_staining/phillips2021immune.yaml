@@ -1,0 +1,10 @@
+datasets:
+  phillips2021immune:
+    name: phillips2021immune
+    path: /path/to/datasets/phillips2021immune
+    modality: codex
+    standardization: identity
+    resolution: 0.37744
+    use_mean_std: False
+    disable_quantile_mask: True
+    replace_nuclear_uniprot_ids: True

@@ -1,0 +1,5 @@
+
+model:
+  _target_: models.gigatime.gigatime_model.SporaGigaTIMEWrapper
+  model_name: gigatime
+  work_dir: /path/to/scratch/external_repos

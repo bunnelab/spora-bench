@@ -40,6 +40,12 @@ Datasets can be downloaded using `rclone`. For detailed instructions, please ref
 
 ## Overview of benchmark pipelines
 
+**spora [bench]** consists of four benchmark pipelines:
+
+1. `run_cell_level_tasks` for cell phenotyping tasks,
+2. `run_tissue_level_tasks` for tissue-level pathology tasks,
+3. `run_virtual_staining_tasks` for virtual staining tasks (multiplex-to-multiplex inpainting), and
+4. `run_he_virtual_staining_tasks` for H&E-to-multiplex virtual staining tasks.
 **spora [bench]** consists of five benchmark pipelines:
 
 1. `run_cell_probe_tasks` for in-cohort cell phenotyping tasks using linear probes,
@@ -134,6 +140,28 @@ python -m spora_bench.benchmarks.run_virtual_staining_tasks model_config=configs
 ```
 Again, the pipeline accepts batched submission via lists or wildcards passed to `datasets_config`.
 
+## H&E virtual staining tasks
+This pipeline evaluates models that translate H&E directly into multiplex marker maps, with
+no multiplex input at all (e.g. ROSIE, HistoPlexer, GigaTIME) — unlike the virtual staining
+pipeline above, which inpaints a dropped multiplex channel from the *other* multiplex channels.
+Each model is scored on whatever markers it shares with the dataset (dataset ∩ model),
+independently of what any other model being run alongside it does or doesn't support.
+`model_config` accepts a single path, a wildcard, or a list of model config paths; when multiple
+models are listed they are all instantiated in the same run purely so their predictions over the
+dataset's tiles can be computed together (e.g. so ROSIE's cross-tile batching still applies) —
+it has no effect on which markers get scored for any individual model. It can be executed via:
+```
+python -m spora_bench.benchmarks.run_he_virtual_staining_tasks model_config=<path-or-list-to-model-configs> datasets_config=<path-to-datasets-config>
+```
+For example, the following command runs ROSIE, HistoPlexer and GigaTIME on `lin2023high`:
+```
+python -m spora_bench.benchmarks.run_he_virtual_staining_tasks model_config=[configs/models/rosie.yaml,configs/models/histoplexer.yaml,configs/models/gigatime.yaml] datasets_config=configs/datasets/he_staining/lin2023high.yaml
+```
+No additional benchmark config is required. `n_crops` (number of randomly sampled tiles per
+dataset; default 1000) may be overridden via CLI, e.g. `n_crops=200`. Results (per-crop
+Pearson/MSE/SSIM and their mean/std summary across crops) are saved per model to
+`output_dir/<model-name>/results/`.
+
 Finally, baseline auto-correlation values between markers can be computed:
 ```
 python -m spora_bench.tools.compute_correlations dataset_config=<path-to-datasets-config>
@@ -200,8 +228,16 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` |
 | danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | 
 
+## H&E virtual staining tasks
+| Dataset | Dataset config |
+| --- | --- |
+| lin2023high | `configs/datasets/he_staining/lin2023high.yaml` |
+| hickey2023organization | `configs/datasets/he_staining/hickey2023organization.yaml` |
+| schurch2020coordinated | `configs/datasets/he_staining/schurch2020coordinated.yaml` |
+| phillips2021immune | `configs/datasets/he_staining/phillips2021immune.yaml` |
+
 # 🤖 Model Zoo
-Our repository contains implementations of two spatial proteomics foundation models, a ResNet baseline and astir:
+Our repository contains implementations of two spatial proteomics foundation models, a ResNet baseline, astir, and three H&E-to-multiplex virtual staining baselines:
 | Model | Model config | Supported Tasks |
 | --- | --- | --- |
 | VirTues | `configs/models/virtues.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
@@ -210,6 +246,11 @@ Our repository contains implementations of two spatial proteomics foundation mod
 | Linear Inpainter | `configs/models/linear_inpainter.yaml | only virtual staining tasks |
 | Eva | `configs/models/eva.yaml` | only virtual staining tasks |
 | astir | `configs/models/astir.yaml` | only cell phenotyping |
+| ROSIE | `configs/models/rosie.yaml` | only H&E virtual staining |
+| HistoPlexer | `configs/models/histoplexer.yaml` | only H&E virtual staining |
+| GigaTIME | `configs/models/gigatime.yaml` | only H&E virtual staining |
+
+**Note:** To run astir, we provide a separate pipeline `spora_bench/benchmarks/run_astir.py` for which benchmark configs are located in `configs/benchmarks/astir`. Similarly, ROSIE/HistoPlexer/GigaTIME run via the separate `spora_bench/benchmarks/run_he_virtual_staining_tasks.py` pipeline described above.
 | MAPS | `configs/models/maps.yaml` | only cross-cohort cell-type annotation (via separate pipeline) | 
 
 **Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/astir` and `configs/benchmarks/maps`.
@@ -284,6 +325,8 @@ We provide a model wrapping class `spora_bench.wrapper.SporaModelWrapper` that d
 | `embed_tissue` | tissue-level | 
 | `postprocess_tile_embeddings` | tissue-level (optional) | 
 | `predict_marker` | virtual staining |
+| `predict_markers_from_he` | H&E virtual staining |
+| `predict_markers_from_he_batch` | H&E virtual staining (optional; override for cross-tile batched inference) |
 | `predict_instance_segmentation` | cross-cohort cell instance segmentation |
 | `predict_cell_types` | cross-cohort cell-type annotation |
 

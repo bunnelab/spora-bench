@@ -1,0 +1,10 @@
+datasets:
+  lin2023high:
+    name: lin2023high
+    path: /path/to/datasets/lin2023high
+    modality: cycif
+    standardization: identity
+    resolution: 0.65
+    use_mean_std: False
+    disable_quantile_mask: True
+    replace_nuclear_uniprot_ids: True
