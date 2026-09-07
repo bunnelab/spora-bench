@@ -358,7 +358,7 @@ model:
   keywordargn: <n-th-keyword-argument>
 ```
 
-# Licence and Terms of Use
+# ⚖️ Licence and Terms of Use
 Copyright (c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, Laboratory of Artificial Intelligence in Molecular Medicine, 2026
 
 This repository and associated code are released under Attribution-NonCommercial-NoDerivatives 4.0 International (CC-BY-ND 4.0) License. See LICENCE.md for more details.
