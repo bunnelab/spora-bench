@@ -135,6 +135,11 @@ python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=con
 ```
 Again, the pipeline accepts batched submission via lists or wildcards passed to `datasets_config`.
 
+As a baseline for the virtual staining tasks, auto-correlation values between markers can be computed:
+```
+python -m spora_bench.tools.compute_correlations dataset_config=<path-to-datasets-config>
+```
+
 ## Virtual staining tasks (H&E-to-H&E)
 This pipeline evaluates models that translate H&E directly into multiplex marker maps, with
 no multiplex input at all (e.g. ROSIE, HistoPlexer, GigaTIME) — unlike the virtual staining
@@ -144,7 +149,9 @@ independently of what any other model being run alongside it does or doesn't sup
 `model_config` accepts a single path, a wildcard, or a list of model config paths; when multiple
 models are listed they are all instantiated in the same run purely so their predictions over the
 dataset's tiles can be computed together (e.g. so ROSIE's cross-tile batching still applies) —
-it has no effect on which markers get scored for any individual model. It can be executed via:
+it has no effect on which markers get scored for any individual model. 
+
+To execute the pipeline, run:
 ```
 python -m spora_bench.benchmarks.run_he_virtual_staining_tasks model_config=<path-or-list-to-model-configs> datasets_config=<path-to-datasets-config>
 ```
@@ -157,10 +164,7 @@ dataset; default 1000) may be overridden via CLI, e.g. `n_crops=200`. Results (p
 Pearson/MSE/SSIM and their mean/std summary across crops) are saved per model to
 `output_dir/<model-name>/results/`.
 
-Finally, baseline auto-correlation values between markers can be computed:
-```
-python -m spora_bench.tools.compute_correlations dataset_config=<path-to-datasets-config>
-```
+
 
 # 📋 Task Zoo
 
