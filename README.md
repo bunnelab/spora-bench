@@ -1,5 +1,6 @@
-<img src=".github/banner-spora-bench.png" alt="Spora Bench" width="60%" style="float:left;" />
-<div style="clear:both;"></div>
+<p align="center">
+  <img src=".github/banner-spora-bench.png" alt="Spora Bench" width="60%">
+</p>
 
 # Introduction
 **spora [bench]** is a benchmark for spatial proteomics foundation models. Building upon the unified dataset of **[spora [data]](TBD)** and the data interface **[spora [io]](https://github.com/bunnelab/spora-io)**, it provides standardized evaluation tasks and protocols to assess and compare spatial proteomics foundation models across scales: 
