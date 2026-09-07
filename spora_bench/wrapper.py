@@ -103,8 +103,19 @@ class SporaModelWrapper(ABC):
                            mask: CellMask,
                            exclude_classes: Optional[List[str]] = None,
                            ) -> torch.Tensor:
+
+        
         """
-        raise NotImplementedError("Inpainting is not implemented for this model.")
+        Predicts the cell types for the given tissue. Cell types are enumerated with unique integers starting from 1.
+        Args:
+            tissue (MultiplexTissue): The input multiplexed tissue. Shape: (C, H, W)
+            mask (CellMask): The input cell mask. Shape: (H, W)
+            exclude_classes (List[str]): A list of cell types to exclude.
+        Returns:
+            torch.Tensor: The predicted cell type class ids for each cell instance in the mask. Shape: (num_cells,) where num_cells is the number of unique cells in the mask.
+        """
+        raise NotImplementedError("Cell type prediction is not implemented for this model.")
+    
 
     def predict_markers_from_he(self,
                                 he_tile: torch.Tensor,
@@ -132,6 +143,7 @@ class SporaModelWrapper(ABC):
         """
         raise NotImplementedError("H&E-to-marker prediction is not implemented for this model.")
 
+
     def predict_markers_from_he_batch(self,
                                       he_tiles: List[torch.Tensor],
                                       target_markers: Optional[Iterable[str]] = None,
@@ -147,15 +159,7 @@ class SporaModelWrapper(ABC):
             List[Dict[str, torch.Tensor]]: One canonical-marker-name -> predicted map dict per input tile.
         """
         return [self.predict_markers_from_he(t, target_markers=target_markers) for t in he_tiles]
-        Predicts the cell types for the given tissue. Cell types are enumerated with unique integers starting from 1.
-        Args:
-            tissue (MultiplexTissue): The input multiplexed tissue. Shape: (C, H, W)
-            mask (CellMask): The input cell mask. Shape: (H, W)
-            exclude_classes (List[str]): A list of cell types to exclude.
-        Returns:
-            torch.Tensor: The predicted cell type class ids for each cell instance in the mask. Shape: (num_cells,) where num_cells is the number of unique cells in the mask.
-        """
-        raise NotImplementedError("Cell type prediction is not implemented for this model.")
+        
 
 
 

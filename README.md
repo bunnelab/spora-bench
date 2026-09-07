@@ -40,19 +40,14 @@ Datasets can be downloaded using `rclone`. For detailed instructions, please ref
 
 ## Overview of benchmark pipelines
 
-**spora [bench]** consists of four benchmark pipelines:
-
-1. `run_cell_level_tasks` for cell phenotyping tasks,
-2. `run_tissue_level_tasks` for tissue-level pathology tasks,
-3. `run_virtual_staining_tasks` for virtual staining tasks (multiplex-to-multiplex inpainting), and
-4. `run_he_virtual_staining_tasks` for H&E-to-multiplex virtual staining tasks.
-**spora [bench]** consists of five benchmark pipelines:
+**spora [bench]** consists of six benchmark pipelines:
 
 1. `run_cell_probe_tasks` for in-cohort cell phenotyping tasks using linear probes,
 2. `run_segmentation_tasks` for cross-cohort cell instance segmentation tasks,
 3. `run_cell_annotation_tasks` for cross-cohort cell annotation tasks,
 4. `run_tissue_level_tasks` for tissue-level pathology tasks, and
-5. `run_virtual_staining_tasks` for virtual staining tasks.
+5. `run_mpx_virtual_staining_tasks` for mutiplex-to-multiplex virtual staining tasks.
+6. `run_he_virtual_staining_tasks` for H&E-to-multiplex virtual staining tasks.
 
 These pipelines are configured and executed using a modular system of `.yaml` configuration files. We distinguish between four types of configuration files:
 
@@ -128,19 +123,19 @@ python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=configs/mod
 ```
 Similar to the cell phenotyping pipeline, batched submission of datasets and benchmark configs is possible via lists or wildcards.
 
-## Virtual staining tasks
+## Virtual staining tasks (MPX-to-H&E)
 
 Virtual staining tasks can be executed via the following command:
 ```
-python -m spora_bench.benchmarks.run_virtual_staining_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config>
+python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=<path-to-model-config> datasets_config=<path-to-datasets-config>
 ```
 No additional benchmark config is required here. For example the following command runs virtual staining on `rigamonti2024integrating`:
 ```
-python -m spora_bench.benchmarks.run_virtual_staining_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/rigamonti2024integrating.yaml
+python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/rigamonti2024integrating.yaml
 ```
 Again, the pipeline accepts batched submission via lists or wildcards passed to `datasets_config`.
 
-## H&E virtual staining tasks
+## Virtual staining tasks (H&E-to-H&E)
 This pipeline evaluates models that translate H&E directly into multiplex marker maps, with
 no multiplex input at all (e.g. ROSIE, HistoPlexer, GigaTIME) — unlike the virtual staining
 pipeline above, which inpaints a dropped multiplex channel from the *other* multiplex channels.
@@ -169,7 +164,7 @@ python -m spora_bench.tools.compute_correlations dataset_config=<path-to-dataset
 
 # 📋 Task Zoo
 
-In the following you find a lists benchmark tasks, for which results are reported in our paper.
+In the following you find lists of benchmark tasks, for which results are reported in our paper.
 
 ## In-cohort cell phenotyping via linear probing tasks 
 | Dataset |  Dataset config (VirTues) | Benchmark config |
@@ -209,7 +204,6 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | lin2023highsubset | `configs/datasets/virtues/lin2023highsubset.yaml` | `configs/benchmarks/cell_annotation/lin2023highsubset.yaml` |
 | rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` | `configs/benchmarks/cell_annotation/rigamonti2024integrating.yaml` |
 
-
 ## Tissue level tasks
 | Dataset |  Dataset config (VirTues) | Benchmark config | 
 | --- | --- | --- |
@@ -220,7 +214,7 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_level/meyer2025stratification.yaml` |
 | wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_level/cords2023cancer.yaml` |
 
-## Virtual staining tasks
+## Virtual staining tasks (MPX-to-MPX)
 | Dataset | Dataset config (VirTues) | 
 | --- | --- | 
 | cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` |
@@ -228,7 +222,7 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` |
 | danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | 
 
-## H&E virtual staining tasks
+## Virtual staining tasks (H&E-to-MPX)
 | Dataset | Dataset config |
 | --- | --- |
 | lin2023high | `configs/datasets/he_staining/lin2023high.yaml` |
@@ -237,21 +231,19 @@ In the following you find a lists benchmark tasks, for which results are reporte
 | phillips2021immune | `configs/datasets/he_staining/phillips2021immune.yaml` |
 
 # 🤖 Model Zoo
-Our repository contains implementations of two spatial proteomics foundation models, a ResNet baseline, astir, and three H&E-to-multiplex virtual staining baselines:
+Our repository contains implementations of three spatial proteomics foundation models, a ResNet and linear regression baseline, three H&E-to-multiplex virtual staining baselines, and two specialized cell-typing tools:
 | Model | Model config | Supported Tasks |
 | --- | --- | --- |
 | VirTues | `configs/models/virtues.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
 | KRONOS | `configs/models/kronos.yaml` | in-cohort cell phenotyping via linear probing and tissue-level task |
 | ResNet | `configs/models/resnet.yaml` | only tissue-level task |
-| Linear Inpainter | `configs/models/linear_inpainter.yaml | only virtual staining tasks |
-| Eva | `configs/models/eva.yaml` | only virtual staining tasks |
+| Linear Inpainter | `configs/models/linear_inpainter.yaml` | only MPX-to-MPX virtual staining tasks |
+| Eva | `configs/models/eva.yaml` | only MPX-to-MPX virtual staining tasks |
 | astir | `configs/models/astir.yaml` | only cell phenotyping |
-| ROSIE | `configs/models/rosie.yaml` | only H&E virtual staining |
-| HistoPlexer | `configs/models/histoplexer.yaml` | only H&E virtual staining |
-| GigaTIME | `configs/models/gigatime.yaml` | only H&E virtual staining |
-
-**Note:** To run astir, we provide a separate pipeline `spora_bench/benchmarks/run_astir.py` for which benchmark configs are located in `configs/benchmarks/astir`. Similarly, ROSIE/HistoPlexer/GigaTIME run via the separate `spora_bench/benchmarks/run_he_virtual_staining_tasks.py` pipeline described above.
 | MAPS | `configs/models/maps.yaml` | only cross-cohort cell-type annotation (via separate pipeline) | 
+| ROSIE | `configs/models/rosie.yaml` | only H&E-to-MPX virtual staining |
+| HistoPlexer | `configs/models/histoplexer.yaml` | only H&E-to-MPX virtual staining |
+| GigaTIME | `configs/models/gigatime.yaml` | only H&E-to-MPX virtual staining |
 
 **Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/astir` and `configs/benchmarks/maps`.
 
@@ -259,7 +251,7 @@ Our repository contains implementations of two spatial proteomics foundation mod
 spora [bench] is designed to be modular benchmark system that can be easily extended by new datasets, tasks and models.
 
 ## Setting up a new dataset
-spora [bench] is built upon spora [data] and spora [io]. Any dataset contained in spora [data], can be easily integrating into spora [bench] by setting up a corresponding `.yaml` dataset  config. This dataset config should adhere to the following format:
+spora [bench] is built upon spora [data] and spora [io]. Any dataset contained in spora [data], can be easily integrating into spora [bench] by setting up a corresponding `.yaml` dataset config. This dataset config should adhere to the following format:
 ```
 datasets:
   <dataset_name>:
@@ -325,10 +317,10 @@ We provide a model wrapping class `spora_bench.wrapper.SporaModelWrapper` that d
 | `embed_tissue` | tissue-level | 
 | `postprocess_tile_embeddings` | tissue-level (optional) | 
 | `predict_marker` | virtual staining |
-| `predict_markers_from_he` | H&E virtual staining |
-| `predict_markers_from_he_batch` | H&E virtual staining (optional; override for cross-tile batched inference) |
 | `predict_instance_segmentation` | cross-cohort cell instance segmentation |
 | `predict_cell_types` | cross-cohort cell-type annotation |
+| `predict_markers_from_he` | H&E virtual staining |
+| `predict_markers_from_he_batch` | H&E virtual staining (optional; override for cross-tile batched inference) |
 
 For details on the expected input arguments and return types of these methods, please refer to our documentation or the `SporaModelWrapper` class itself.
 
