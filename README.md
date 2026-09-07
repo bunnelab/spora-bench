@@ -17,7 +17,8 @@ For more information about **spora**, please also refer to the following ressour
 3. 📋 [Task Zoo](#-task-zoo)
 3. 🤖 [Model Zoo](#-model-zoo)
 4. 🛠️ [Setting up New Datasets, Tasks and Models](#️-setting-up-new-datasets-tasks-and-models)
-5. 📝 [Citation](#-citation)
+5. ⚖️ [Licence and Terms of Use](#licence-and-terms-of-use)
+6. 📝 [Citation](#-citation)
 
 # ⚙️ Installation
 Please first install our data loading interface, **[spora-io](https://github.com/bunnelab/spora-io)**:
