@@ -1,4 +1,4 @@
-<img src=".github/banner-spora-bench.png" alt="Spora Bench" width="45%" style="float:left;" />
+<img src=".github/banner-spora-bench.png" alt="Spora Bench" width="60%" style="float:left;" />
 <div style="clear:both;"></div>
 
 # Introduction
@@ -30,7 +30,7 @@ Finally, ensure that the foundation models of interest are properly set up. For 
 
 spora [bench] can also be easily extended to evaluate new foundation models. For instructions on how to integrate a new model, please refer to the corresponding section below.
 
-# 📈 Running benchmarks
+# 📈 Running Benchmarks
 
 ## Downloading datasets
 
@@ -247,7 +247,7 @@ Our repository contains implementations of three spatial proteomics foundation m
 
 **Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/astir` and `configs/benchmarks/maps`.
 
-# 🛠️ Setting up new datasets, tasks and models
+# 🛠️ Setting up New Datasets, Tasks and Models
 spora [bench] is designed to be modular benchmark system that can be easily extended by new datasets, tasks and models.
 
 ## Setting up a new dataset
@@ -344,6 +344,11 @@ model:
   ...
   keywordargn: <n-th-keyword-argument>
 ```
+
+# Licence and Terms of Use
+Copyright (c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, Laboratory of Artificial Intelligence in Molecular Medicine, 2026
+
+This repository and associated code are released under Attribution-NonCommercial-NoDerivatives 4.0 International (CC-BY-ND 4.0) License. See LICENCE.md for more details.
 
 # 📝 Citation
 *To be announced*
