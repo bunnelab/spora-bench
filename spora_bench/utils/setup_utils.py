@@ -1,4 +1,7 @@
 import random
+import subprocess
+from pathlib import Path
+
 import torch
 import numpy as np
 from glob import glob
@@ -43,3 +46,41 @@ def load_multiple_configs(config_paths: Union[str, List[str]]) -> DictConfig:
         raise ValueError(f"No configuration files found for the provided paths: {config_paths}")            
 
     return OmegaConf.merge(*configs)
+
+def check_hf_login():
+    """
+    Verifies that the current environment is authenticated with the Hugging Face Hub.
+    Raises:
+        RuntimeError: If no valid Hugging Face credentials are found.
+    """
+    from huggingface_hub import HfApi
+
+    try:
+        HfApi().whoami()
+    except Exception as e:
+        raise RuntimeError(
+            "Hugging Face authentication is required to download this model's weights. "
+            "Run `huggingface-cli login` (or set the HF_TOKEN environment variable) and retry."
+        ) from e
+
+def clone_git_repo(url: str, dest: Path):
+    """
+    Clones a git repository to `dest` if it does not already exist, raising an informative
+    error if git is unavailable or the clone fails (e.g. missing network access or permissions).
+    Args:
+        url (str): The git repository URL to clone.
+        dest (Path): The destination directory for the clone.
+    """
+    if dest.exists():
+        return
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        subprocess.run(["git", "clone", url, str(dest)], check=True, capture_output=True, text=True)
+    except FileNotFoundError as e:
+        raise RuntimeError("`git` executable not found. Please install git and ensure it is on PATH.") from e
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"Failed to clone '{url}' into '{dest}'. Check your network connection and git "
+            f"credentials/permissions for this repository.\ngit stderr: {e.stderr}"
+        ) from e

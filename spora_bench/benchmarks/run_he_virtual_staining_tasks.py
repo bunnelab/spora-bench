@@ -1,16 +1,14 @@
 """H&E -> multiplex marker virtual staining benchmark.
 
-Unlike `run_virtual_staining_tasks.py` (which drops one multiplex channel from a tissue
-and predicts it from the *other* multiplex channels), this pipeline evaluates models that
-translate H&E directly into multiplex marker maps, with no multiplex input at all
-(e.g. ROSIE, HistoPlexer, GigaTIME). Evaluation is per-tile-crop (via `spora_io.SporaDataset`,
+This pipeline evaluates models that translate H&E directly into multiplex marker maps, with no multiplex input at all
+(e.g. ROSIE, HistoPlexer, GigaTIME). Evaluation is per-tile (via `spora_io.SporaDataset`,
 which can jointly sample the `he` and a multiplex modality from the same tile) rather than
 per-tissue, and markers are canonicalized (see `spora_bench.utils.virtual_staining_utils`) so
 that models with different channel vocabularies can be matched against a dataset's own
 vocabulary regardless of naming differences.
 
-Each model is scored on whatever markers it shares with the dataset (dataset ∩ model), fully
-independently of the other models being run alongside it -- there is no additional restriction
+Each model is scored on whatever markers it shares with the dataset, fully
+independently of the other models being run alongside it, there is no additional restriction
 to markers shared across all models. `model_config` accepts a single path, wildcard, or list of
 model config paths and instantiates all of them in one run purely so their per-tile predictions
 can be computed together (e.g. so ROSIE's cross-tile batching still applies); it does not affect
@@ -37,8 +35,7 @@ TILE = 256
 
 
 def load_model_configs(model_config_paths: Union[str, List[str]]) -> List[DictConfig]:
-    """Loads one or more model config files as SEPARATE configs (not merged, unlike
-    `load_multiple_configs`) since every model config shares the same top-level `model` key
+    """Loads one or more model config files as SEPARATE configs since every model config shares the same top-level `model` key
     and merging would let the last one silently overwrite the rest. Supports the same
     single-path / list-of-paths / glob-wildcard flexibility as `load_multiple_configs`.
     """
@@ -132,13 +129,10 @@ def evaluate_dataset(dataset_key: str,
     if not crops:
         return empty
 
-    # dataset-level marker vocabulary: union of canon tokens seen across sampled crops
-    # (channel_names can differ per tissue; image_loading_mask gates them per crop below)
     ds_markers = set()
     for c in crops:
         ds_markers |= set(build_marker_index(c["names"]))
 
-    # marker set scored per model: dataset ∩ model, independently for each model.
     model_scored = {
         m.model_name: sorted(ds_markers & set(getattr(m, "supported_he_markers", set())))
         for m in models
@@ -150,9 +144,7 @@ def evaluate_dataset(dataset_key: str,
         return empty
 
     he_tiles = [c["he_tensor"] for c in crops]
-
-    # predict once per model over ALL crops of this dataset, so models that batch inference
-    # across tiles (e.g. ROSIE) get the full benefit of that.
+    
     preds_by_model = {}
     for m in models:
         shared = model_scored[m.model_name]
@@ -168,7 +160,6 @@ def evaluate_dataset(dataset_key: str,
         gt, names, mask = c["gt"], c["names"], c["mask"]
         H, W = gt.shape[-2:]
 
-        # per-crop valid dataset markers (channel measured/loaded)
         valid = {canon(names[j]): j for j in range(len(names))
                 if mask[j] and canon(names[j]) is not None}
 

@@ -5,6 +5,7 @@ from typing import Dict, Iterable, Optional
 import torch
 import torch.nn.functional as F
 
+from spora_bench.utils.setup_utils import check_hf_login, clone_git_repo
 from spora_bench.utils.virtual_staining_utils import build_marker_index
 from spora_bench.wrapper import SporaModelWrapper
 
@@ -19,11 +20,6 @@ GIGA_BG = {1, 2}
 
 
 class SporaGigaTIMEWrapper(SporaModelWrapper):
-    """In-process GigaTIME UNet++. Feeds imagenet-normalized H&E directly (matches the
-    official testing notebook's albumentations Normalize() == imagenet mean/std, which is
-    exactly what spora_io's 'he' modality already outputs). GigaTIME emits per-pixel sigmoid
-    presence masks, NOT intensities; we use the continuous sigmoid prob as the comparable
-    surrogate (documented)."""
     channels = GIGA_CHANNELS
 
     def __init__(self,
@@ -31,19 +27,17 @@ class SporaGigaTIMEWrapper(SporaModelWrapper):
                 work_dir: str,
                 ):
         super().__init__(model_name)
-        import subprocess
         from huggingface_hub import snapshot_download
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         d = Path(work_dir) / "gigatime_code"
-        if not d.exists():
-            subprocess.run(["git", "clone",
-                            "https://github.com/prov-gigatime/GigaTIME.git", str(d)], check=True)
+        clone_git_repo("https://github.com/prov-gigatime/GigaTIME.git", d)
         sys.path.insert(0, str(d / "scripts"))
         import archs
 
         self.model = archs.gigatime(num_classes=23, input_channels=3)
+        check_hf_login()
         wdir = Path(snapshot_download(repo_id="prov-gigatime/GigaTIME"))
         sd = torch.load(wdir / "model.pth", map_location="cpu", weights_only=False)
         if "state_dict" in sd:
@@ -52,7 +46,6 @@ class SporaGigaTIMEWrapper(SporaModelWrapper):
         self.model.load_state_dict(sd)
         self.model.to(self.device).eval()
 
-        # canonical name -> GigaTIME channel idx, excluding background channels
         self.marker_idx = {c: i for c, i in build_marker_index(self.channels).items() if i not in GIGA_BG}
         self.supported_he_markers = set(self.marker_idx.keys())
 
@@ -70,6 +63,6 @@ class SporaGigaTIMEWrapper(SporaModelWrapper):
         if x.shape[-2:] != (256, 256):
             x = F.interpolate(x, size=(256, 256), mode="bilinear", align_corners=False)
         logits = self.model(x)
-        prob = torch.sigmoid(logits).squeeze(0).cpu()  # (23, H, W), continuous surrogate for the binary mask
+        prob = torch.sigmoid(logits).squeeze(0).cpu()  # continuous surrogate for the binary mask as suggested in original publication
 
         return {c: prob[self.marker_idx[c]] for c in keep_canon}

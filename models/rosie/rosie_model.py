@@ -7,6 +7,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
+from spora_bench.utils.setup_utils import check_hf_login
 from spora_bench.utils.virtual_staining_utils import (
     IMAGENET_MEAN, IMAGENET_STD, build_marker_index, denorm_he_uint8,
 )
@@ -27,7 +28,7 @@ ROSIE_CHANNELS = [
 
 class _ROSIEPatchDataset(Dataset):
     """Flattens (tile, grid-point) into one index space and yields 128px patches
-    preprocessed exactly as ROSIE's evaluate.py (ToTensor -> Resize224 -> imagenet norm)."""
+    preprocessed exactly as ROSIE's evaluate.py."""
 
     def __init__(self, he_images: List[np.ndarray], patch: int, grid_stride: int, exclude_bg: bool):
         import torchvision.transforms as T
@@ -72,15 +73,6 @@ class _ROSIEPatchDataset(Dataset):
 
 
 class SporaROSIEWrapper(SporaModelWrapper):
-    """In-process, batched. ConvNeXt-Small patch regressor (50 outputs) + Gaussian
-    overlap-add blending, faithful to ROSIE's evaluate.py with postprocessing OFF
-    (the notebook's default). Only markers requested via `target_markers` are accumulated,
-    so memory stays small.
-
-    `predict_markers_from_he_batch` runs one DataLoader over ALL patches of ALL input tiles
-    (rather than looping tile-by-tile), which is the main speedup over a naive per-tile call
-    to `predict_markers_from_he`.
-    """
     channels = ROSIE_CHANNELS
     PATCH = 128
 
@@ -103,6 +95,7 @@ class SporaROSIEWrapper(SporaModelWrapper):
         self.num_workers = num_workers
         self.exclude_bg = exclude_bg
 
+        check_hf_login()
         d = Path(snapshot_download(repo_id="ericwu09/ROSIE", tqdm_class=tqdm))
         weights = d / "best_model_single.pth"
         m = tvm.convnext_small(weights=None)  # weights come from the ckpt
