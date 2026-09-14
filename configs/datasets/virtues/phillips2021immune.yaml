@@ -1,7 +1,7 @@
 datasets:
   phillips2021immune:
     name: phillips2021immune
-    path: /path/to/datasets/phillips2021immune
+    path: /mnt/aimm/scratch/datasets_v2/phillips2021immune
     modality: codex
     standardization: quantile_clipping_log1p/uq_0.99_image
     resolution: 1.0

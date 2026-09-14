@@ -1,8 +1,8 @@
 datasets:
-  phillips2021immune:
-    name: phillips2021immune
-    path: /mnt/aimm/scratch/datasets_v2/phillips2021immune
-    modality: codex
+  danenberg2022breast:
+    name: danenberg2022breast
+    path: /mnt/aimm/scratch/datasets_v2/danenberg2022breast
+    modality: imc
     standardization: quantile_clipping_log1p/uq_0.99_image
     resolution: 1.0
     use_mean_std: True

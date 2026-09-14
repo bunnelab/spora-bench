@@ -1,7 +1,7 @@
 datasets:
   wang2023spatial:
     name: wang2023spatial
-    path: /path/to/datasets/wang2023spatial
+    path: /mnt/aimm/scratch/datasets_v2/wang2023spatial
     modality: imc
     standardization: quantile_clipping_log1p/uq_0.99_image
     resolution: 1.0

@@ -1,7 +1,7 @@
 datasets:
   schulz2024immucan:
     name: schulz2024immucan
-    path: /path/to/datasets/schulz2024immucan
+    path: /mnt/aimm/scratch/datasets_v2/schulz2024immucan
     modality: imc
     standardization: quantile_clipping/uq_0.99_image
     resolution: 1.0
