@@ -34,7 +34,7 @@ def run_virtual_stainings(config: DictConfig):
             resolution=dataset_config.resolution,
             tile_size=128,
             tile_strategy='default',
-            filter_list=dataset_config.filter_list
+            filter_list=dataset_config.filter_list,
             use_mean_std=dataset_config.use_mean_std,
             disable_quantile_mask=dataset_config.disable_quantile_mask,
             verbose=False,
