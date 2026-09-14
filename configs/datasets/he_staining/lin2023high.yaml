@@ -5,6 +5,7 @@ datasets:
     modality: cycif
     standardization: identity
     resolution: 0.65
+    filter_list: ['gaussian_blur',]
     use_mean_std: False
     disable_quantile_mask: True
     replace_nuclear_uniprot_ids: True

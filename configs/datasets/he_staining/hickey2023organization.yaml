@@ -5,6 +5,7 @@ datasets:
     modality: codex
     standardization: identity
     resolution: 0.37744
+    filter_list: ['gaussian_blur',]
     use_mean_std: False
     disable_quantile_mask: True
     replace_nuclear_uniprot_ids: True
