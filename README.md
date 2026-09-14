@@ -88,14 +88,14 @@ Results (confusion matrix, classification report, and bootstrapped classificatio
 
 To give an example, the following command runs the cell phenotyping benchmark for VirTues on the `hoch2022multiplexed` dataset:
 ```
-python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_level/hoch2022multiplexed.yaml
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_probe/hoch2022multiplexed.yaml
 ```
 **Note:** Some models, for instance KRONOS, might require distinct dataset configs to account for differences in standardization procedures. For KRONOS you find the default dataset configs in `configs/datasets/kronos/`.
 
 ### Batched submission of benchmark tasks
 To run multiple benchmarks at once, you may pass to `datasets_config` and `benchmarks_config` not only a single path but also paths containing wildcards and lists of paths. For instance, to run all cell phenotyping tasks for VirTues, execute
 ```
-python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_level
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_probe
 ```
 
 ## Cross-cohort cell instance segmentation
@@ -133,7 +133,7 @@ python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=configs/mod
 ```
 Similar to the cell phenotyping pipeline, batched submission of datasets and benchmark configs is possible via lists or wildcards.
 
-## Virtual staining tasks (MPX-to-H&E)
+## Virtual staining tasks (MPX-to-MPX)
 
 Virtual staining tasks can be executed via the following command:
 ```
@@ -150,7 +150,7 @@ As a baseline for the virtual staining tasks, auto-correlation values between ma
 python -m spora_bench.tools.compute_correlations dataset_config=<path-to-datasets-config>
 ```
 
-## Virtual staining tasks (H&E-to-H&E)
+## Virtual staining tasks (H&E-to-MPX)
 This pipeline evaluates models that translate H&E directly into multiplex marker maps, with
 no multiplex input at all (e.g. ROSIE, HistoPlexer, GigaTIME) — unlike the virtual staining
 pipeline above, which inpaints a dropped multiplex channel from the *other* multiplex channels.
@@ -183,16 +183,16 @@ In the following you find lists of benchmark tasks, for which results are report
 ## In-cohort cell phenotyping via linear probing tasks 
 | Dataset |  Dataset config (VirTues) | Benchmark config |
 | --- | --- | --- | 
-| cords2023cancer | `configs/datasets/virtues/cords2023cancer.yaml` | `configs/benchmarks/cell_level/cords2023cancer.yaml` |
-| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_level/cords2024cancer.yaml` |
-| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_level/danenberg2022breast.yaml` |
-| hoch2022multiplexed | `configs/datasets/virtues/hoch2022multiplexed.yaml` | `configs/benchmarks/cell_level/hoch2022multiplexed.yaml` |
-| lin2023highsubset | `configs/datasets/virtues/lin2023highsubset.yaml` | `configs/benchmarks/cell_level/lin2023highsubset.yaml` | 
-| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_level/meyer2025stratification.yaml` |
-| moldoveanu2022spatially | `configs/datasets/virtues/moldoveanu2022spatially.yaml` | `configs/benchmarks/cell_level/moldoveanu2022spatially.yaml` |
-| rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` | `configs/benchmarks/cell_level/rigamonti2024integrating.yaml` |
-| schulz2024immucan |  `configs/datasets/virtues/schulz2024immucan.yaml` | `configs/benchmarks/cell_level/schulz2024immucan.yaml` | 
-| wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_level/wang2023spatial.yaml` | 
+| cords2023cancer | `configs/datasets/virtues/cords2023cancer.yaml` | `configs/benchmarks/cell_probe/cords2023cancer.yaml` |
+| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_probe/cords2024cancer.yaml` |
+| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_probe/danenberg2022breast.yaml` |
+| hoch2022multiplexed | `configs/datasets/virtues/hoch2022multiplexed.yaml` | `configs/benchmarks/cell_probe/hoch2022multiplexed.yaml` |
+| lin2023highsubset | `configs/datasets/virtues/lin2023highsubset.yaml` | `configs/benchmarks/cell_probe/lin2023highsubset.yaml` | 
+| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_probe/meyer2025stratification.yaml` |
+| moldoveanu2022spatially | `configs/datasets/virtues/moldoveanu2022spatially.yaml` | `configs/benchmarks/cell_probe/moldoveanu2022spatially.yaml` |
+| rigamonti2024integrating | `configs/datasets/virtues/rigamonti2024integrating.yaml` | `configs/benchmarks/cell_probe/rigamonti2024integrating.yaml` |
+| schulz2024immucan |  `configs/datasets/virtues/schulz2024immucan.yaml` | `configs/benchmarks/cell_probe/schulz2024immucan.yaml` | 
+| wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_probe/wang2023spatial.yaml` | 
 
 ## Cross-cohort cell instance segmentation tasks
 | Dataset |  Dataset config (VirTues) |
@@ -221,12 +221,12 @@ In the following you find lists of benchmark tasks, for which results are report
 ## Tissue level tasks
 | Dataset |  Dataset config (VirTues) | Benchmark config | 
 | --- | --- | --- |
-| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_level/cords2024cancer.yaml` |
-| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_level/danenberg2022breast.yaml` |
-| fischer2023multiplex | `configs/datasets/virtues/fischer2023multiplex.yaml` | `configs/benchmarks/cell_level/fischer2023multiplex.yaml` |
-| hoch2022multiplexed | `configs/datasets/virtues/hoch2022multiplexed.yaml` | `configs/benchmarks/cell_level/hoch2022multiplexed.yaml` |
-| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_level/meyer2025stratification.yaml` |
-| wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_level/cords2023cancer.yaml` |
+| cords2024cancer | `configs/datasets/virtues/cords2024cancer.yaml` | `configs/benchmarks/cell_probe/cords2024cancer.yaml` |
+| danenberg2022breast | `configs/datasets/virtues/danenberg2022breast.yaml` | `configs/benchmarks/cell_probe/danenberg2022breast.yaml` |
+| fischer2023multiplex | `configs/datasets/virtues/fischer2023multiplex.yaml` | `configs/benchmarks/cell_probe/fischer2023multiplex.yaml` |
+| hoch2022multiplexed | `configs/datasets/virtues/hoch2022multiplexed.yaml` | `configs/benchmarks/cell_probe/hoch2022multiplexed.yaml` |
+| meyer2025stratification | `configs/datasets/virtues/meyer2025stratification.yaml` | `configs/benchmarks/cell_probe/meyer2025stratification.yaml` |
+| wang2023spatial | `configs/datasets/virtues/wang2023spatial.yaml` | `configs/benchmarks/cell_probe/cords2023cancer.yaml` |
 
 ## Virtual staining tasks (MPX-to-MPX)
 | Dataset | Dataset config (VirTues) | 
@@ -259,7 +259,7 @@ Our repository contains implementations of three spatial proteomics foundation m
 | HistoPlexer | `configs/models/histoplexer.yaml` | only H&E-to-MPX virtual staining |
 | GigaTIME | `configs/models/gigatime.yaml` | only H&E-to-MPX virtual staining |
 
-**Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/astir` and `configs/benchmarks/maps`.
+**Note:** To run astir and MAPS, we provide separate pipelines `spora_bench/benchmarks/run_astir.py` and `spora_bench/benchmarks/run_maps.py` for which benchmark configs are located in `configs/benchmarks/[TASK]/astir` and `configs/benchmarks/[TASK]/maps`.
 
 # 🛠️ Setting up New Datasets, Tasks and Models
 spora [bench] is designed to be modular benchmark system that can be easily extended by new datasets, tasks and models.
@@ -289,7 +289,7 @@ To setup a new cell phenotyping or tissue-level benchmark task, simply create a 
 datasets:
   <dataset_name>:
     benchmarks:
-      cell_level: 
+      cell_probe: 
         <task_name>:
           label_col: <column_name>
           excluded_classes: <list of classes to exclude>

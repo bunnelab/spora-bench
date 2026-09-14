@@ -1,7 +1,7 @@
 import numpy as np
 from skimage.segmentation import relabel_sequential
 from scipy.optimize import linear_sum_assignment
-
+from loguru import logger
 
 
 def _label_overlap(x : np.ndarray, y : np.ndarray):
@@ -16,13 +16,15 @@ def _label_overlap(x : np.ndarray, y : np.ndarray):
             overlap[i, j] is the number of pixels where x == i and y == j
             n_labels_x = x.max() + 1, n_labels_y = y.max() + 1
     """
-    x = x.ravel()
-    y = y.ravel()
+    x = x.ravel().astype(np.int64)
+    y = y.ravel().astype(np.int64)
     x_max = x.max() + 1
     y_max = y.max() + 1
 
+    logger.info(f"Computing label overlap: x_max={x_max}, y_max={y_max}, x.shape={x.shape}, y.shape={y.shape}")
+
     overlap = np.bincount(
-        x.astype(np.int64) * y_max + y.astype(np.int64),
+        x * y_max + y,
         minlength=x_max * y_max
     ).reshape(x_max, y_max)
 

@@ -13,7 +13,6 @@ from virtues.utils.utils import (load_marker_embedding_dict,
 from virtues.modules.segmentation.unet import VirtuesSegmentationHead
 from virtues.utils.segmentation import remove_small_cells, assign_cell_types
 
-
 from spora_bench.wrapper import SporaModelWrapper
 
 

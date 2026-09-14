@@ -83,7 +83,12 @@ def run_cell_annotation(
                 metadata = cell_metadata_per_tissue_id[tissue_id]
 
                 tissue = dataset.get_tissue(tissue_id, kind="uniprot_filtered", preprocess=True, image_mode="CHW")
-                true_cell_mask = dataset.get_cell_instance_mask(tissue_id,)
+
+                try:
+                    true_cell_mask = dataset.get_cell_instance_mask(tissue_id,)
+                except ValueError as e:
+                    logger.warning(f"Skipping tissue {tissue_id} due to error in retrieving cell instance mask: {e}")
+                    continue
 
                 if tissue.image.shape[1] < 256 or tissue.image.shape[2] < 256:
                     logger.warning(f"Tissue {tissue_id} has image size {tissue.image.shape[1:]} which is smaller than 256x256. Skipping this tissue.")
@@ -96,8 +101,20 @@ def run_cell_annotation(
                 cell_ids = cell_ids[cell_ids != 0] # exclude background
                 assert len(cell_ids) == len(y_pred), f"Number of predicted cell types ({len(y_pred)}) does not match number of unique cells in mask ({len(cell_ids)}) for tissue {tissue_id}."
 
+                filter_occurs_in_metadata = np.isin(cell_ids, metadata.index.values)
+                if not np.all(filter_occurs_in_metadata):
+                    logger.warning(f"Some cell IDs (n={np.sum(~filter_occurs_in_metadata)}) in tissue {tissue_id} do not occur in the metadata. These cells will be excluded from evaluation.")
+                    y_pred = y_pred[filter_occurs_in_metadata]
+                    cell_ids = cell_ids[filter_occurs_in_metadata]
+
                 y_pred_decoded = label_encoder.inverse_transform(y_pred)
                 y_true_decoded = metadata.loc[cell_ids, label_col].values
+
+                filter_is_na = pd.isna(y_true_decoded)
+                if np.any(filter_is_na):
+                    logger.warning(f"Some true labels (n={np.sum(filter_is_na)}) in tissue {tissue_id} are NaN. These cells will be excluded from evaluation.")
+                    y_pred_decoded = y_pred_decoded[~filter_is_na]
+                    y_true_decoded = y_true_decoded[~filter_is_na]
 
                 y_pred_all.append(y_pred_decoded)
                 y_true_all.append(y_true_decoded)

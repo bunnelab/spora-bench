@@ -36,7 +36,7 @@ def run_linear_probes(
     os.makedirs(results_dir, exist_ok=True)
     
     for dataset_key, dataset_config in config.datasets.items():
-        if not "benchmarks" in dataset_config or not "cell_level" in dataset_config.benchmarks:
+        if not "benchmarks" in dataset_config or not "cell_probe" in dataset_config.benchmarks:
             logger.info(f"No cell-level benchmark found for dataset {dataset_key}. Skipping...")
             continue
 
@@ -69,8 +69,8 @@ def run_linear_probes(
         base_train_adata = adata[adata.obs['tissue_id'].isin(train_tids)]
 
         # TODO clean up this task_config.task structure
-        for task_name in dataset_config.benchmarks.cell_level.keys():
-            task_config = dataset_config.benchmarks.cell_level[task_name]
+        for task_name in dataset_config.benchmarks.cell_probe.keys():
+            task_config = dataset_config.benchmarks.cell_probe[task_name]
             label_col = task_config.label_col
             excluded_classes = task_config.excluded_classes
             logger.info(f'Running cell level benchmark for label column: {label_col} with excluded classes: {excluded_classes}')

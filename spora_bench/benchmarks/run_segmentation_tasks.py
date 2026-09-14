@@ -51,9 +51,13 @@ def run_segmentations(
         test_tissue_ids = dataset.tissue_modality_metadata[dataset.tissue_modality_metadata['split'] == 'test'].index.values
 
         for tissue_id in tqdm(test_tissue_ids, desc=f"Processing tissues for dataset {dataset_key}"):
-
             tissue = dataset.get_tissue(tissue_id, kind="uniprot_filtered", preprocess=True, image_mode="CHW")
-            true_cell_mask = dataset.get_cell_instance_mask(tissue_id,).mask.numpy()
+
+            try:
+                true_cell_mask = dataset.get_cell_instance_mask(tissue_id,).mask.numpy()
+            except ValueError as e:
+                logger.warning(f"Skipping tissue {tissue_id} due to error in retrieving cell instance mask: {e}")
+                continue
 
             # TODO check this
             if tissue.image.shape[1] < 256 or tissue.image.shape[2] < 256:
@@ -66,8 +70,17 @@ def run_segmentations(
                 f"Shape mismatch for {tissue_id}: {true_cell_mask.shape} vs {predicted_mask.shape}"
             )
 
-            match_stats = compute_matches(true_cell_mask, predicted_mask, iou_thresholds=THRESHOLDS)
-            all_stats.extend(match_stats)
+            if max(true_cell_mask.shape) > 2048:
+                logger.warning(f"Tissue {tissue_id} has a large image size {true_cell_mask.shape}. Running matching in a tiled manner.")
+                for i in range(0, true_cell_mask.shape[0], 2048):
+                    for j in range(0, true_cell_mask.shape[1], 2048):
+                        true_tile = true_cell_mask[i:i+2048, j:j+2048]
+                        pred_tile = predicted_mask[i:i+2048, j:j+2048]
+                        match_stats = compute_matches(true_tile, pred_tile, iou_thresholds=THRESHOLDS)
+                        all_stats.extend(match_stats)
+            else:
+                match_stats = compute_matches(true_cell_mask, predicted_mask, iou_thresholds=THRESHOLDS)
+                all_stats.extend(match_stats)
 
         if not all_stats:
             logger.error(f"No valid tissues processed for dataset {dataset_key}. Skipping results aggregation and saving.")

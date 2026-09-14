@@ -21,10 +21,13 @@ from spora_io import MultiplexImagingDataset
 """
 Note on astir's evaluation:
 Dealing with excluded classes in astir is a bit tricky. Astir has two special classes: "Unknown" and "Other".
-With the label option `excluded_classes` we can remove samples assigned to these classes from the (training [does not matter] and ) test set.
+With the label option `excluded_classes` we can filter out samples assigned to these classes from the data.
 This should not constitute a bias in the evaluation as long as other methods are also not evaluated on these ground truth samples (e.g. by excluding them in classification_report(...,labels=...)).
 
-We can disable the prediction of astir's special class `Unknown` by setting the threshold to 0.0. However, astir might still predict `Other` for some cells, leading to an increase count of false negatives. 
+Astir will then be trained to predict all cell types in the marker configuration (`cell_types` field). It will be evaluated on the cell types listed in the `eval_cell_types` field.
+The cell types occuring in the data should be a subset of the cell types in the marker configuration, and the cell types in the marker configuration should be a subset of the eval cell types. 
+
+We disable the prediction of astir's special class `Unknown` by setting the threshold to 0.0. However, astir might still predict `Other` for some cells, leading to an increase count of false negatives. 
 This is a limitation of astir's model and should be taken into account when interpreting the results. This prediction could only be avoided by modifying the astir source code, which is out of scope for this benchmark.
 """
 
@@ -42,7 +45,7 @@ def run_astir(config: DictConfig):
     os.makedirs(intensities_dir, exist_ok=True)
 
     for dataset_key, dataset_config in config.datasets.items():
-        if not "benchmarks" in dataset_config or not "cell_level" in dataset_config.benchmarks:
+        if not "benchmarks" in dataset_config or not "cell_annotation" in dataset_config.benchmarks:
             logger.info(f"No cell-level benchmark found for dataset {dataset_key}. Skipping...")
             continue
 
@@ -72,8 +75,8 @@ def run_astir(config: DictConfig):
         base_test_adata = adata[adata.obs['tissue_id'].isin(test_tids)]
 
         # Iterate over each cell-level benchmark task for the dataset and run Astir
-        for task_name in dataset_config.benchmarks.cell_level:
-            task_config = dataset_config.benchmarks.cell_level[task_name]
+        for task_name in dataset_config.benchmarks.cell_annotation:
+            task_config = dataset_config.benchmarks.cell_annotation[task_name]
             label_col = task_config.label_col
             excluded_classes = task_config.excluded_classes
             logger.info(f'Running Astir for label column: {label_col} with excluded classes: {excluded_classes}')
@@ -88,17 +91,21 @@ def run_astir(config: DictConfig):
                 test_adata = test_adata[~test_adata.obs[label_col].isin(excluded_classes)]
             
             # Forbid Unknown and Other classes as these have a special meaning in astir.
-            unique_classes = np.unique(np.concatenate([train_adata.obs[label_col].unique(), test_adata.obs[label_col].unique()]))
-            if "Other" in unique_classes:
+            occuring_classes = np.unique(np.concatenate([train_adata.obs[label_col].unique(), test_adata.obs[label_col].unique()]))
+            if "Other" in occuring_classes:
                 raise ValueError(f"The 'Other' class is not allowed in the label column for Astir benchmarks as it has a special meaning in astir.")
-            if "Unknown" in unique_classes:
+            if "Unknown" in occuring_classes:
                 raise ValueError(f"The 'Unknown' class is not allowed in the label column for Astir benchmarks as it has a special meaning in astir.")
             
             # Check that configuration fits the underlying data (e.g. all required markers are present in the adata, all cell types in the marker config match cell types in the data.) 
             marker_config = OmegaConf.create({"cell_types": task_config['cell_types']})
             cell_types = marker_config.cell_types.keys()
-            if not set(cell_types) == set(unique_classes):
-                raise ValueError(f"Marker config cell types {cell_types} do not match the unique classes in the data {unique_classes}. Please check your benchmark configuration for task {task_name} in dataset {dataset_key}.")
+            eval_cell_types = task_config.eval_cell_types
+            
+            if not set(occuring_classes).issubset(set(cell_types)):
+                raise ValueError(f"Marker config cell types {cell_types} do not cover all occuring cell_types in the data {occuring_classes}. Please check your benchmark configuration for task {task_name} in dataset {dataset_key}.")
+            if not set(cell_types).issubset(set(eval_cell_types)):
+                raise ValueError(f"Cell types predicted by astir {cell_types} must be a subset of the eval cell types {eval_cell_types}. Please check your benchmark configuration for task {task_name} in dataset {dataset_key}.")
             
             required_markers = []
             for _, markers in marker_config.cell_types.items():
@@ -130,28 +137,25 @@ def run_astir(config: DictConfig):
 
             # Evaluate and save results
             logger.info('Evaluating results...')
-            report = classification_report(y_true=y_true, y_pred=y_pred, labels=unique_classes, output_dict=True)
+            report = classification_report(y_true=y_true, y_pred=y_pred, labels=eval_cell_types, output_dict=True)
             report = transform_classification_report_to_df(report)
             report = report.assign(model=config.model.model_name, task=label_col)
             report.to_parquet(results_dir / f'{dataset_key}_{label_col}_classification_report.parquet')
 
             # CAREFUL: for astir we can't use the fast bootstrap implementation at the moment as it behaves differently in the special case that labels is a subset of all occuring labels
             # TODO make this consistent but still compatible with astir's special classes Unknown and Other
-            bootstrap_report = bootstrap_classification_report(y_true=y_true, y_pred=y_pred, n_bootstraps=1000, labels=unique_classes, random_state=42)
+            bootstrap_report = bootstrap_classification_report(y_true=y_true, y_pred=y_pred, n_bootstraps=1000, labels=eval_cell_types, random_state=42)
             bootstrap_report = transform_bootstrap_report_to_df(bootstrap_report, n_bootstraps=1000)
             bootstrap_report = bootstrap_report.assign(model=config.model.model_name, task=label_col)
             bootstrap_report.to_parquet(results_dir / f'{dataset_key}_{label_col}_bootstrap_classification_report.parquet')
 
             # We remove the computation of the confusion matrix as as we should not disregard here the special classes Unknown and Other. Otherwise computing the recall-normalized confusion matrix later will diverge from the classification report.
             # We keep the code here for now but it is commented out. If you want to compute a confusion matrix for astir results, please make sure to interpret it correctly in the context of astir's special classes.
-            # cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=unique_classes)
-            # cm = pd.DataFrame(cm, index=unique_classes, columns=unique_classes)
+            # cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=occuring_classes)
+            # cm = pd.DataFrame(cm, index=occuring_classes, columns=occuring_classes)
             # cm.to_parquet(results_dir / f'{dataset_key}_{label_col}_confusion_matrix.parquet')
 
             logger.info(f'Finished Astir benchmark for dataset {dataset_key} and task {label_col}. Results saved to {results_dir}')
-
-
-
 
 
 if __name__ == "__main__":
