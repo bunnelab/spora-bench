@@ -1,0 +1,4 @@
+
+model:
+  _target_: models.instanseg.instanseg.SporaInstansegWrapper
+  model_name: instanseg

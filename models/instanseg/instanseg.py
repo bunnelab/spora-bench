@@ -1,5 +1,5 @@
 from spora_bench.wrapper import SporaModelWrapper
-
+from instanseg.inference_class import InstanSeg
 
 class SporaInstansegWrapper(SporaModelWrapper):
 
@@ -7,4 +7,23 @@ class SporaInstansegWrapper(SporaModelWrapper):
                  model_name: str,
                  ):
         super().__init__(model_name)
-        raise NotImplementedError("SporaInstansegWrapper is not implemented yet. Please implement the necessary methods for this wrapper.")
+        self.model = InstanSeg(
+            model_type="fluorescence_nuclei_and_cells",
+        )
+
+    def predict_instance_segmentation(self, tissue):
+        """
+        Predicts instance segmentation for the given tissue using the InstanSeg model.
+        Args:
+            tissue: The input tissue to be segmented.
+        Returns:
+            predicted_mask: The predicted instance segmentation mask.
+        """
+        predicted_mask = self.model.eval_medium_image(
+            tissue.image,
+            pixel_size=1.0,
+            normalise=True,
+            return_image_tensor=False,
+            target="cells",
+        )
+        return predicted_mask[0,0].int()

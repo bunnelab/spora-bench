@@ -1,3 +1,4 @@
 
-output_dir: /path/to/output/dir/
+# output_dir: /path/to/output/dir/
+output_dir: /mnt/aimm/scratch/shr/spora-bench
 random_seed: 42
