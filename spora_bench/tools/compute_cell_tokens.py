@@ -31,7 +31,7 @@ def compute_cell_tokens(config: OmegaConf):
             standardization=dataset_config.standardization,
             resolution=dataset_config.resolution,
             tile_size=None,
-            filter_list=dataset_config.filter_list
+            filter_list=dataset_config.filter_list,
             use_mean_std=dataset_config.use_mean_std,
             disable_quantile_mask=dataset_config.disable_quantile_mask,
         )
