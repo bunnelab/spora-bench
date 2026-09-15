@@ -70,12 +70,12 @@ def run_segmentations(
                 f"Shape mismatch for {tissue_id}: {true_cell_mask.shape} vs {predicted_mask.shape}"
             )
 
-            if max(true_cell_mask.shape) > 2048:
+            if max(true_cell_mask.shape) > 1024:
                 logger.warning(f"Tissue {tissue_id} has a large image size {true_cell_mask.shape}. Running matching in a tiled manner.")
-                for i in range(0, true_cell_mask.shape[0], 2048):
-                    for j in range(0, true_cell_mask.shape[1], 2048):
-                        true_tile = true_cell_mask[i:i+2048, j:j+2048]
-                        pred_tile = predicted_mask[i:i+2048, j:j+2048]
+                for i in range(0, true_cell_mask.shape[0], 1024):
+                    for j in range(0, true_cell_mask.shape[1], 1024):
+                        true_tile = true_cell_mask[i:i+1024, j:j+1024]
+                        pred_tile = predicted_mask[i:i+1024, j:j+1024]
                         match_stats = compute_matches(true_tile, pred_tile, iou_thresholds=THRESHOLDS)
                         all_stats.extend(match_stats)
             else:
