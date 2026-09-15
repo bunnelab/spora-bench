@@ -1,0 +1,5 @@
+
+model:
+  _target_: models.cellpose.cellpose.SporaCellposeWrapper
+  model_name: cellpose
+  gpu: true

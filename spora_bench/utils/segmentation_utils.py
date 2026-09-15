@@ -75,7 +75,7 @@ def compute_matches(true_mask: np.ndarray, pred_mask: np.ndarray, iou_thresholds
     n_matched = min(n_true, n_pred)
 
     if n_matched == 0:
-        return [(0, n_pred, n_true) for _ in iou_thresholds]
+        return [(thr, 0, n_pred, n_true) for thr in iou_thresholds]
 
     results = []
     for thr in iou_thresholds:
