@@ -1,22 +1,23 @@
 import os
+from collections import defaultdict
 from pathlib import Path
-from omegaconf import DictConfig, OmegaConf
-from loguru import logger
-from tqdm import tqdm
+
 import numpy as np
 import pandas as pd
-from collections import defaultdict
-
-from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
-from spora_io.datasets import MultiplexImagingDataset
-from spora_bench.utils.segmentation_utils import compute_matches
-from sklearn.preprocessing import LabelEncoder
-from spora_bench.utils.evaluation_utils import (bootstrap_classification_report,
-    transform_bootstrap_report_to_df,
-    transform_classification_report_to_df)
-from sklearn.metrics import classification_report, confusion_matrix
-
 from hydra.utils import instantiate
+from loguru import logger
+from omegaconf import DictConfig, OmegaConf
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from spora_io.datasets import MultiplexImagingDataset
+from tqdm import tqdm
+
+from spora_bench.utils.evaluation_utils import (
+    bootstrap_classification_report, transform_bootstrap_report_to_df,
+    transform_classification_report_to_df)
+from spora_bench.utils.segmentation_utils import compute_matches
+from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
+
 
 def run_cell_annotation(
         config: DictConfig
@@ -48,6 +49,7 @@ def run_cell_annotation(
             use_mean_std=dataset_config.use_mean_std,
             disable_quantile_mask=dataset_config.disable_quantile_mask,
             verbose=False,
+            replace_nuclear_uniprot_ids=True,
         )
 
         cell_metadata = pd.read_parquet(dataset.path / 'metadata' / 'cells.parquet')
@@ -125,6 +127,12 @@ def run_cell_annotation(
 
             y_pred_all = np.concatenate(y_pred_all)
             y_true_all = np.concatenate(y_true_all)
+
+            # filter out samples whose ground truth labels are not in the eval_classes as otherwise associated predictions will be considered as additional false positives skewing the precision of other classes
+            # no need to do this for y_pred since the model should not predict excluded classes
+            filter_eval_classes = np.isin(y_true_all, eval_classes)
+            y_pred_all = y_pred_all[filter_eval_classes]
+            y_true_all = y_true_all[filter_eval_classes]
 
             logger.info('Evaluating results...')
             report = classification_report(y_true=y_true_all, y_pred=y_pred_all, labels=eval_classes, output_dict=True)

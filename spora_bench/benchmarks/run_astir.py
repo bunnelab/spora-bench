@@ -127,8 +127,22 @@ def run_astir(config: DictConfig):
 
             # Run astir
             logger.info(f"Fitting Astir model...")
-            astir_model = ast.Astir(input_expr=X, marker_dict=marker_config)
-            astir_model.fit_type(max_epochs=config.model.max_epochs, n_init=config.model.n_init, n_init_epochs=config.model.n_init_epochs)
+            scdata = ast.SCDataset(
+                expr_input=X,
+                marker_dict=marker_config['cell_types'],
+                include_other_column=False,
+                dtype=torch.float64,
+                device='cuda' if torch.cuda.is_available() else 'cpu'
+            )
+            astir_model = ast.Astir(input_expr=(scdata, None), marker_dict=marker_config)
+
+            # astir_model = ast.Astir(input_expr=X, marker_dict=marker_config)
+            try: 
+                astir_model.fit_type(max_epochs=config.model.max_epochs, n_init=config.model.n_init, n_init_epochs=config.model.n_init_epochs)
+            except RuntimeError as e:
+                logger.error(f"Error occurred while fitting Astir model: {e}")
+                logger.error(f'A likely cause it that the astir model is not (yet) adapted to disable the prediction of the special class `Other` in astir. Please check the astir source code and adapt it accordingly: Change all occurences of `C+1` to `C` in astir.models.celltype.py and astir.models.celltype_recognet.py, Remove `+ ["Other"]` in astir.models.celltype.py). For now, we will stop this script.')
+                return
 
             logger.info(f"Making predictions...")
             y_pred = astir_model.get_celltypes(threshold=config.model.threshold).cell_type
@@ -151,9 +165,12 @@ def run_astir(config: DictConfig):
 
             # We remove the computation of the confusion matrix as as we should not disregard here the special classes Unknown and Other. Otherwise computing the recall-normalized confusion matrix later will diverge from the classification report.
             # We keep the code here for now but it is commented out. If you want to compute a confusion matrix for astir results, please make sure to interpret it correctly in the context of astir's special classes.
-            # cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=occuring_classes)
-            # cm = pd.DataFrame(cm, index=occuring_classes, columns=occuring_classes)
-            # cm.to_parquet(results_dir / f'{dataset_key}_{label_col}_confusion_matrix.parquet')
+            
+            # Change: We compute the confusion matrix over all occuring classes.
+            cm_classes = np.unique(np.concatenate([y_true, y_pred]))
+            cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=cm_classes)
+            cm = pd.DataFrame(cm, index=cm_classes, columns=cm_classes)
+            cm.to_parquet(results_dir / f'{dataset_key}_{label_col}_confusion_matrix.parquet')
 
             logger.info(f'Finished Astir benchmark for dataset {dataset_key} and task {label_col}. Results saved to {results_dir}')
 
@@ -161,12 +178,14 @@ def run_astir(config: DictConfig):
 if __name__ == "__main__":
     cli_config = OmegaConf.from_cli()
     config = OmegaConf.load('configs/base_config.yaml')
-    model_config = OmegaConf.load(f'configs/models/astir.yaml')
 
+    model_config = OmegaConf.load(cli_config.model_config)
     datasets_config = load_multiple_configs(cli_config.datasets_config)
     benchmarks_config = load_multiple_configs(cli_config.benchmarks_config)
 
     config = OmegaConf.merge(config, model_config, datasets_config, benchmarks_config, cli_config)
+
+    logger.info(f"Running astir benchmark with configuration: \n{OmegaConf.to_yaml(config)}")
 
     set_seed(config.random_seed)
     run_astir(config)

@@ -21,8 +21,6 @@ def _label_overlap(x : np.ndarray, y : np.ndarray):
     x_max = x.max() + 1
     y_max = y.max() + 1
 
-    logger.info(f"Computing label overlap: x_max={x_max}, y_max={y_max}, x.shape={x.shape}, y.shape={y.shape}")
-
     overlap = np.bincount(
         x * y_max + y,
         minlength=x_max * y_max

@@ -45,6 +45,7 @@ def run_segmentations(
             use_mean_std=dataset_config.use_mean_std,
             disable_quantile_mask=dataset_config.disable_quantile_mask,
             verbose=False,
+            replace_nuclear_uniprot_ids=True,
         )
 
         all_stats = []
