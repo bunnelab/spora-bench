@@ -21,7 +21,7 @@ from spora_bench.utils.evaluation_utils import (bootstrap_classification_report,
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
 from spora_bench.tools.compute_cell_tokens import compute_cell_tokens
 from spora_bench.utils.setup_utils import load_multiple_configs, set_seed
-from spora_bench.utils.tissue_level_utils import get_patient_splits
+from spora_bench.utils.tissue_level_utils import get_tissue_splits
 
 
 def run_linear_probes(
@@ -60,10 +60,10 @@ def run_linear_probes(
         adata.obs = pd.merge(left=adata.obs, right=cell_metadata, on=['tissue_id', 'cell_id'], how='left', validate='one_to_one')
 
         # Load train test splits based on patient splits provided by spora-data
-        patient_splits = get_patient_splits(dataset_config)
+        tissue_splits = get_tissue_splits(dataset_config)
         all_tids = adata.obs["tissue_id"].unique()
-        train_tids = [tid for tid in all_tids if patient_splits[tid.split("_")[1]] == "train"]
-        test_tids = [tid for tid in all_tids if patient_splits[tid.split("_")[1]] == "test"]
+        train_tids = [tid for tid in all_tids if tissue_splits[tid] == "train"]
+        test_tids = [tid for tid in all_tids if tissue_splits[tid] == "test"]
 
         base_test_adata = adata[adata.obs['tissue_id'].isin(test_tids)]
         base_train_adata = adata[adata.obs['tissue_id'].isin(train_tids)]
