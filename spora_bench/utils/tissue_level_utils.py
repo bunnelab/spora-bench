@@ -56,6 +56,11 @@ def get_patient_splits(ds_config: OmegaConf):
     metadata = metadata[["patient_id", "split"]].set_index("patient_id")
     return metadata.to_dict()["split"]
 
+def get_tissue_splits(ds_config: OmegaConf):
+    metadata = pd.read_parquet(ds_config.path + "/metadata/tissues.parquet")
+    metadata = metadata[["tissue_id", "split"]].set_index("tissue_id")
+    return metadata.to_dict()["split"]
+
 def config_has_tissue_level_benchmark(config):
     if "benchmarks" not in config:
         return False
