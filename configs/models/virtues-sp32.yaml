@@ -1,0 +1,10 @@
+
+
+model:
+  _target_: models.virtues.virtues_model.SporaVirTuesWrapper
+  model_name: virtues-sp32
+  checkpoint_path: /path/to/model.safetensors
+  marker_embeddings_dir: /path/to/datasets/marker_embeddings/esm2_t30_150M_UR50D
+  tile_size: 128
+  segmentation_checkpoint_path: null
+  num_classes: 9

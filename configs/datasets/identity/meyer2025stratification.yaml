@@ -1,0 +1,10 @@
+datasets:
+  meyer2025stratification:
+    name: meyer2025stratification
+    path: /path/to/datasets/meyer2025stratification
+    modality: imc
+    standardization: identity
+    resolution: 1.0
+    filter_list: []
+    use_mean_std: False
+    disable_quantile_mask: True

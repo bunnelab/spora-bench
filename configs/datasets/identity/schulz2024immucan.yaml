@@ -1,0 +1,10 @@
+datasets:
+  schulz2024immucan:
+    name: schulz2024immucan
+    path: /path/to/datasets/schulz2024immucan
+    modality: imc
+    standardization: identity
+    resolution: 1.0
+    filter_list: []
+    use_mean_std: False
+    disable_quantile_mask: True

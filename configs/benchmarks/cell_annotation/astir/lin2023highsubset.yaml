@@ -1,0 +1,27 @@
+datasets:
+  lin2023highsubset:
+    benchmarks:
+      cell_annotation: 
+        cell_type_atlas:
+          label_col: cell_type_atlas
+          excluded_classes: [Unknown,]
+          cell_types:
+            Tumor:
+              - Pan-CK
+              - E-cadherin
+            Fibroblasts /Stroma:
+              - SMA
+            Myeloid:
+              - CD68
+              - CD163
+            CD4 T cell:
+              - CD3e
+              - CD4
+            CD8 T cell:
+              - CD3e
+              - CD8a
+            B cell:
+              - CD20
+            Vessel / Endo.:
+              - CD31
+          eval_cell_types: ['Tumor', 'Fibroblasts /Stroma', 'Myeloid', 'CD4 T cell', 'CD8 T cell', 'B cell', 'Vessel / Endo.']
