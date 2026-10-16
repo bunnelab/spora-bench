@@ -3,14 +3,14 @@
 </p>
 
 # Introduction
-**spora [bench]** is a benchmark for spatial proteomics foundation models. Building upon the unified dataset of **[spora [data]](TBD)** and the data interface **[spora [io]](https://github.com/bunnelab/spora-io)**, it provides standardized evaluation tasks and protocols to assess and compare spatial proteomics foundation models across scales: 
+**spora [bench]** is a benchmark for spatial proteomics foundation models. Building upon the unified dataset of **[spora [data]](spora.bioimagearchive.org)** and the data interface **[spora [io]](https://github.com/bunnelab/spora-io)**, it provides standardized evaluation tasks and protocols to assess and compare spatial proteomics foundation models across scales: 
 
 At the *subcellular-level* virtual staining assess a model's learnt understanding of complex marker co-localization patterns. At the *cell-level*, coarse- and fine-grained cell phenotyping tasks evaluate the local biological information content captured by representations via standardized logistic regression. Cell instance segmentation and annotation benchmarks assess how well these representations generalize to unseen datasets. At the *tissue-level*, pathology tasks (cancer grading, subtyping and treatment response prediction), test a model's abilities to capture clinically relevant local and global tissue features. 
 
 For more information about **spora**, please also refer to the following ressources:
-1. Our paper: *To be announced*
-2. Our project website: *To be announced*
-3. Documentation: *To be announced*
+1. Paper: *To be announced*
+2. [Project website](spora.bioimagearchive.org)
+3. [Documentation](https://spora.epfl.ch/docs/)
 
 ## Table of Contents
 1. ⚙️ [Installation](#️-installation)
@@ -44,7 +44,7 @@ spora [bench] can also be easily extended to evaluate new foundation models. For
 
 ## Downloading datasets
 
-With **spora [data]**, we provide a comprehensive collection of standardized datasets, including benchmark tasks. You can find all available datasets in our [Dataset Browser](TBD).
+With **spora [data]**, we provide a comprehensive collection of standardized datasets, including benchmark tasks. You can find all available datasets in our [Dataset Browser](spora.bioimagearchive.org).
 
 Datasets can be downloaded using `rclone`. For detailed instructions, please refer to our documentation.
 
@@ -365,4 +365,11 @@ Copyright (c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, Laboratory 
 This repository and associated code are released under Attribution-NonCommercial-NoDerivatives 4.0 International (CC-BY-NC-ND 4.0) License. See LICENCE.md for more details.
 
 # 📝 Citation
-*To be announced*
+```
+@inproceedings{querfurth2026spora,
+  title = {{spora: A Unified Multimodal Dataset and Platform for Spatial Proteomics}},
+  author = {von Querfurth, Benedikt and Wenckstern, Johann and Jain, Eeshaan and Klein, Lukas and Cheng, Phil F. and Cheng, Yexiang and Vincent-Cuaz, Cédric and Frossard, Pascal and Haberecker, Martina and Wicki, Andreas and Michielin, Olivier and Bunne, Charlotte},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS) Evaluations \& Datasets (E\&D) Track},
+  year = {2026}
+}
+```
