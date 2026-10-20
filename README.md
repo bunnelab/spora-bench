@@ -8,7 +8,7 @@
 At the *subcellular-level* virtual staining assess a model's learnt understanding of complex marker co-localization patterns. At the *cell-level*, coarse- and fine-grained cell phenotyping tasks evaluate the local biological information content captured by representations via standardized logistic regression. Cell instance segmentation and annotation benchmarks assess how well these representations generalize to unseen datasets. At the *tissue-level*, pathology tasks (cancer grading, subtyping and treatment response prediction), test a model's abilities to capture clinically relevant local and global tissue features. 
 
 For more information about **spora**, please also refer to the following ressources:
-1. Paper: *To be announced*
+1. [Paper](https://arxiv.org/abs/2610.24002)
 2. [Project website](https://spora.bioimagearchive.org)
 3. [Documentation](https://spora.epfl.ch/docs/)
 
