@@ -72,7 +72,7 @@ For the purpose of simply running the benchmarks listed in the paper, all requir
 
 1. Update the `output_dir` field in `configs/base_config`. Results will be written to subdirectories of `output_dir/<model_name>/`.
 2. In all dataset configs (e.g. `configs/datasets/virtues/cords2023cancer.yaml`), update the `path` field to point to the root directory of the respective dataset.
-3. In the model config (e.g. `configs/models/virtues.yaml`), update all required model-specific path variables (e.g. `checkpoint_path` and `marker_embeddings_dir` for VirTues; `checkpoint_path` and `marker_metadata_path` for KRONOS).
+3. In the model config (e.g. `configs/models/virtues-sp32.yaml`), update all required model-specific path variables (e.g. `checkpoint_path` and `marker_embeddings_dir` for VirTues; `checkpoint_path` and `marker_metadata_path` for KRONOS).
 
 ## In-cohort cell phenotyping via linear probes
 
@@ -88,14 +88,14 @@ Results (confusion matrix, classification report, and bootstrapped classificatio
 
 To give an example, the following command runs the cell phenotyping benchmark for VirTues on the `hoch2022multiplexed` dataset:
 ```
-python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_probe/hoch2022multiplexed.yaml
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues-sp32.yaml datasets_config=configs/datasets/virtues/hoch2022multiplexed.yaml benchmarks_config=configs/benchmarks/cell_probe/hoch2022multiplexed.yaml
 ```
 **Note:** Some models, for instance KRONOS, might require distinct dataset configs to account for differences in standardization procedures. For KRONOS you find the default dataset configs in `configs/datasets/kronos/`.
 
 ### Batched submission of benchmark tasks
 To run multiple benchmarks at once, you may pass to `datasets_config` and `benchmarks_config` not only a single path but also paths containing wildcards and lists of paths. For instance, to run all cell phenotyping tasks for VirTues, execute
 ```
-python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_probe
+python -m spora_bench.benchmarks.run_cell_probe_tasks model_config=configs/models/virtues-sp32.yaml datasets_config=configs/datasets/virtues/*.yaml benchmarks_config=configs/benchmarks/cell_probe
 ```
 
 ## Cross-cohort cell instance segmentation
@@ -129,7 +129,7 @@ python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=<path-to-mo
 ```
 For example, the following command runs all tissue-level tasks on `cords2024cancer` using VirTues:
 ```
-python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/cords2024cancer.yaml benchmarks_config=configs/benchmarks/tissue_level/cords2024cancer.yaml
+python -m spora_bench.benchmarks.run_tissue_level_tasks model_config=configs/models/virtues-sp32.yaml datasets_config=configs/datasets/virtues/cords2024cancer.yaml benchmarks_config=configs/benchmarks/tissue_level/cords2024cancer.yaml
 ```
 Similar to the cell phenotyping pipeline, batched submission of datasets and benchmark configs is possible via lists or wildcards.
 
@@ -141,7 +141,7 @@ python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=<pa
 ```
 No additional benchmark config is required here. For example the following command runs virtual staining on `rigamonti2024integrating`:
 ```
-python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=configs/models/virtues.yaml datasets_config=configs/datasets/virtues/rigamonti2024integrating.yaml
+python -m spora_bench.benchmarks.run_mpx_virtual_staining_tasks model_config=configs/models/virtues-sp32.yaml datasets_config=configs/datasets/virtues/rigamonti2024integrating.yaml
 ```
 Again, the pipeline accepts batched submission via lists or wildcards passed to `datasets_config`.
 
@@ -248,7 +248,7 @@ In the following you find lists of benchmark tasks, for which results are report
 Our repository contains implementations of three spatial proteomics foundation models, a ResNet and linear regression baseline, three H&E-to-multiplex virtual staining baselines, and two specialized cell-typing tools:
 | Model | Model config | Supported Tasks |
 | --- | --- | --- |
-| VirTues | `configs/models/virtues.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
+| VirTues | `configs/models/virtues-sp32.yaml` | in-cohort cell phenotyping via linear probing, tissue-level task and virtual staining |
 | KRONOS | `configs/models/kronos.yaml` | in-cohort cell phenotyping via linear probing and tissue-level task |
 | ResNet | `configs/models/resnet.yaml` | only tissue-level task |
 | Linear Inpainter | `configs/models/linear_inpainter.yaml` | only MPX-to-MPX virtual staining tasks |
